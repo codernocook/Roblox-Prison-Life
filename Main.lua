@@ -355,6 +355,17 @@ if game.PlaceId == 155615604 then
     PlayerController:NewButton("InstaKill", "Fix Kill Problem and kill player you want!", function()
         task.spawn(function()
             local lastposInstakill = char:WaitForChild("HumanoidRootPart").Position
+            local NeutralTeamSwitch = {
+                [1] = "Medium stone grey"
+            }
+            
+            workspace.Remote.TeamEvent:FireServer(unpack(NeutralTeamSwitch))
+
+            local InmatesTeamSwitch = {
+                [1] = "Bright orange"
+            }
+            
+            workspace.Remote.TeamEvent:FireServer(unpack(InmatesTeamSwitch))
         local loadchar = {
             [1] = plr.Name
         }
