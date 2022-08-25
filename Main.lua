@@ -41,7 +41,7 @@ if game.PlaceId == 155615604 then
     plr.OnTeleport:Connect(function(State)
         if State == Enum.TeleportState.Started then
             if queueteleport then
-                queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/codernocook/Roblox-Prison-Life/main/Main.lua'))()")
+                queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/codernocook/prisonlife/main/Main.lua'))()")
             end
         end
     end)    
