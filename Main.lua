@@ -718,9 +718,31 @@ if game.PlaceId == 155615604 then
     end)
 
     local RemoveAllDoor = ExploitTab:NewSection("Door")
+    local oldremovedoorteam
+
+    local function RemoveDoorLoop(state)
+        task.spawn(function()
+            repeat
+                task.wait()
+                if state == false then break end
+
+                if state == true then
+                    for i, v in pairs(game:GetService("Workspace"):WaitForChild("Doors"):GetChildren()) do
+                        if v:FindFirstChild("block") then
+                            for looprun = 1, 50 do
+                                firetouchinterest(char:WaitForChild("Head"), v:WaitForChild("block"):WaitForChild("hitbox"), 0)
+                                firetouchinterest(char:WaitForChild("Head"), v:WaitForChild("block"):WaitForChild("hitbox"), 1)
+                            end
+                        else
+                            task.wait()
+                        end
+                    end
+                end
+            until state == false
+        end)
+    end
 
     RemoveAllDoor:NewToggle("Remove All Doors", "Remove all door in server side everyone will see the door remove!", function(state)
-        local oldremovedoorteam
         if state then
             task.spawn(function()
                 oldremovedoorteam = plr.TeamColor
@@ -732,55 +754,26 @@ if game.PlaceId == 155615604 then
                 }
                 
                 workspace.Remote.TeamEvent:FireServer(unpack(args))
-            end
-                for i, v in pairs(game:GetService("Workspace"):WaitForChild("Doors"):GetChildren()) do
-                    repeat
-                        task.wait()
-                        if v:FindFirstChild("block") then
-                            firetouchinterest(char:WaitForChild("Head"), v:WaitForChild("block"):WaitForChild("hitbox"), 0)
-                            firetouchinterest(char:WaitForChild("Head"), v:WaitForChild("block"):WaitForChild("hitbox"), 1)
-                            firetouchinterest(char:WaitForChild("Head"), v:WaitForChild("block"):WaitForChild("hitbox"), 0)
-                            firetouchinterest(char:WaitForChild("Head"), v:WaitForChild("block"):WaitForChild("hitbox"), 1)
-                            firetouchinterest(char:WaitForChild("Head"), v:WaitForChild("block"):WaitForChild("hitbox"), 0)
-                            firetouchinterest(char:WaitForChild("Head"), v:WaitForChild("block"):WaitForChild("hitbox"), 1)
-                        else
-                            task.wait()
-                        end
-                        if state == false then
-                            if oldremovedoorteam == nil then
-                                task.wait()
-                            else
-                                if plr.TeamColor == oldremovedoorteam then
-                                    task.wait()
-                                else
-                                    local doneremovedoor = {
-                                        [1] = oldremovedoorteam
-                                    }
-                                    
-                                    workspace.Remote.TeamEvent:FireServer(unpack(doneremovedoor))
-                                end
-                            end
-                            break
-                        end
-                    until state == false
+                if plr.Team == "Guards" then
+                    RemoveDoorLoop(true)
                 end
+            end
             end)
         else
             task.spawn(function()
-                if oldremovedoorteam == nil then
+                RemoveDoorLoop(false)
+                if oldremovedoorteam == nil or oldremovedoorteam == "" then
                     task.wait()
                 else
-                    if plr.TeamColor == oldremovedoorteam then
-                        task.wait()
-                    else
-                        local doneremovedoor = {
-                            [1] = oldremovedoorteam
+                    if plr.TeamColor ~= oldremovedoorteam then
+                        RemoveDoorLoop(false)
+                        local args = {
+                            [1] = "Bright orange"
                         }
                         
-                        workspace.Remote.TeamEvent:FireServer(unpack(doneremovedoor))
+                        workspace.Remote.TeamEvent:FireServer(unpack(args))
                     end
                 end
-                state = false
             end)
         end
     end)
