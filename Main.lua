@@ -746,22 +746,20 @@ if game.PlaceId == 155615604 then
         end)
     end
 
-    RemoveAllDoor:NewToggle("Remove All Doors", "Remove all door in server side everyone will see the door remove!", function(state)
+    RemoveAllDoor:NewToggle("Remove All Doors", "Remove all door in server sidely everyone will see the door remove!", function(state)
         if state then
             task.spawn(function()
                 oldremovedoorteam = plr.TeamColor
-            if plr.Team == "Guards" then
-                task.wait()
-            else
-                local args = {
-                    [1] = "Bright blue"
-                }
-                
-                workspace.Remote.TeamEvent:FireServer(unpack(args))
                 if plr.Team == "Guards" then
+                    task.wait()
+                else
+                    local args = {
+                        [1] = "Bright blue"
+                    }
+                    
+                    workspace.Remote.TeamEvent:FireServer(unpack(args))
                     RemoveDoorLoop(true)
                 end
-            end
             end)
         else
             task.spawn(function()
