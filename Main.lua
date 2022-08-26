@@ -722,29 +722,8 @@ if game.PlaceId == 155615604 then
     end)
 
     local RemoveAllDoor = ExploitTab:NewSection("Door")
+    local RemoteAllDoorLoop = false
     local oldremovedoorteam
-
-    local function RemoveDoorLoop(state)
-        task.spawn(function()
-            repeat
-                task.wait()
-                if state == false then break end
-
-                if state == true then
-                    for i, v in pairs(game:GetService("Workspace"):WaitForChild("Doors"):GetChildren()) do
-                        if v:FindFirstChild("block") then
-                            for looprun = 1, 50 do
-                                firetouchinterest(char:WaitForChild("Head"), v:WaitForChild("block"):WaitForChild("hitbox"), 0)
-                                firetouchinterest(char:WaitForChild("Head"), v:WaitForChild("block"):WaitForChild("hitbox"), 1)
-                            end
-                        else
-                            task.wait()
-                        end
-                    end
-                end
-            until state == false
-        end)
-    end
 
     RemoveAllDoor:NewToggle("Remove All Doors", "Remove all door in server sidely everyone will see the door remove!", function(state)
         if state then
@@ -758,17 +737,17 @@ if game.PlaceId == 155615604 then
                     }
                     
                     workspace.Remote.TeamEvent:FireServer(unpack(args))
-                    RemoveDoorLoop(true)
+                    RemoteAllDoorLoop = true
                 end
             end)
         else
             task.spawn(function()
-                RemoveDoorLoop(false)
+                RemoteAllDoorLoop = false
                 if oldremovedoorteam == nil or oldremovedoorteam == "" then
                     task.wait()
                 else
                     if plr.TeamColor ~= oldremovedoorteam then
-                        RemoveDoorLoop(false)
+                        RemoteAllDoorLoop = false
                         local args = {
                             [1] = "Bright orange"
                         }
@@ -848,6 +827,17 @@ if game.PlaceId == 155615604 then
             game:GetService("Workspace").CurrentCamera.CameraSubject = char
             SpectateStatus = false
            end)
+        end
+
+        if RemoteAllDoorLoop == true then
+            for i, v in pairs(game:GetService("Workspace"):WaitForChild("Doors"):GetChildren()) do
+                if v:FindFirstChild("block") then
+                    for looprun = 1, 50 do
+                        firetouchinterest(char:WaitForChild("Head"), v:WaitForChild("block"):WaitForChild("hitbox"), 0)
+                        firetouchinterest(char:WaitForChild("Head"), v:WaitForChild("block"):WaitForChild("hitbox"), 1)
+                    end
+                end
+            end
         end
 
         Humanoid.StateChanged:Connect(function(oldstate, newstate)
