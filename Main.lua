@@ -73,7 +73,7 @@ if game.PlaceId == 155615604 then
     end)
     Speed:NewSlider("Speed", "SliderInfo", 500, 16, function(speedcallback)
         task.spawn(function()
-            SpeedNumber = speedcallback
+            SpeedNumber = tonumber(speedcallback)
         end)
     end)
 
