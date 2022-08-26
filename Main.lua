@@ -496,54 +496,6 @@ if game.PlaceId == 155615604 then
        end)
     end)
 
-    local LoopTeleportBring = false
-
-    PlayerController:NewButton("Bring", "Bring player you want to you!", function()
-        local loadcharbefore = {
-            [1] = plr.Name
-        }
-        
-        workspace.Remote.loadchar:InvokeServer(unpack(loadcharbefore))
-
-        local oldposbeforebring = char:WaitForChild("HumanoidRootPart").CFrame
-
-        local gunpickup = {
-            [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
-        }
-
-        workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
-
-        task.wait(.1)
-
-        char:FindFirstChildWhichIsA("Humanoid"):Destroy()
-        Instance.new("Humanoid", char)
-
-        if plr.Backpack:FindFirstChild("Remington 870") then
-            plr.Backpack:WaitForChild("Remington 870").Parent = char
-        elseif char:FindFirstChild("Remington 870") then
-            task.wait()
-        elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-            local args = {
-                [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
-            }
-
-            workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-            plr.Backpack:WaitForChild("Remington 870").Parent = char
-        end
-        LoopTeleportBring = true
-        task.wait(.5)
-        LoopTeleportBring = false
-        char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
-        task.wait(.5)
-        local loadcharafter = {
-            [1] = plr.Name
-        }
-        
-        workspace.Remote.loadchar:InvokeServer(unpack(loadcharafter))
-        task.wait(.1)
-        char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
-    end)
-
     PlayerController:NewToggle("Spectate", "Wiew player cam", function(state)
         if state then
             if PlayerControll ~= nil then
@@ -586,167 +538,26 @@ if game.PlaceId == 155615604 then
 
     --ExploitTab--
     local CrashServer = ExploitTab:NewSection("ServerCrasher")
+    local MaxCrashPacket = 100
+    local Raypos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+    local RayRotatepos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+    local PacketCount = 0
+    local PacketCrashTable = {
+        [1] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+    }
     CrashServer:NewToggle("Crash!", "Make the server laggy roblox will shut down it!", function(state)
         if state == true then
             task.spawn(function()
                 CrashServerMode = true
-                local Raypos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
-    local RayRotatepos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
     game:GetService("RunService").Heartbeat:Connect(function()
         if CrashServerMode == true then
             local args = {
-                [1] = {
-                    [1] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [2] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [3] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [4] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [5] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [6] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [7] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [8] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [9] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [10] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [11] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [12] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [13] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [14] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [15] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [16] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [17] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [18] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [19] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [20] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [21] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [22] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [23] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [24] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                    [25] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    }
-                },
+                [1] = PacketCrashTable,
                 [2] = GunCrashModule
             }
             
@@ -759,6 +570,7 @@ if game.PlaceId == 155615604 then
         else
             task.spawn(function()
                 CrashServerMode = false
+                table.clear(PacketCrashTable)
             end)
         end
     end)
@@ -774,6 +586,29 @@ if game.PlaceId == 155615604 then
                 GunCrashModule = game:GetService("Players").LocalPlayer.Character:FindFirstChild("AK-47")
             end
         end)
+    end)
+
+    CrashServer:NewSlider("Packet", "Change Max Crash Packet", 100, 20, function(PacketCallBack)
+       task.spawn(function()
+            MaxCrashPacket = tonumber(PacketCallBack)
+            table.clear(PacketCrashTable)
+            PacketCount = 0
+            repeat task.wait()
+                PacketCount += 1
+                local PacketTemplate = {
+                    [PacketCount] = {
+                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+                        ["Distance"] = 5.194826602935791,
+                        ["Cframe"] = CFrame.new(0, 0, 0),
+                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+                    },
+                }
+                table.insert(PacketCrashTable, PacketTemplate)
+                if PacketCount == MaxCrashPacket then
+                    break
+                end
+            until PacketCount == MaxCrashPacket
+       end)
     end)
 
     local RemoveAllDoor = ExploitTab:NewSection("Door")
@@ -872,20 +707,6 @@ if game.PlaceId == 155615604 then
                 if PlayerControll ~= nil then
                     if PlayerControll.Character then
                         char:WaitForChild("HumanoidRootPart").CFrame = PlayerControll.Character:WaitForChild("HumanoidRootPart").CFrame
-                    end
-                end
-            end)
-        end
-
-        if LoopTeleportBring == true then
-            task.spawn(function()
-                if PlayerControll ~= nil then
-                    if PlayerControll.Character then
-                        local targetroot = PlayerControll.Character:WaitForChild("HumanoidRootPart").CFrame
-                        for i = 1, 5 do
-                            char:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(targetroot.X + 1, targetroot.Y + -1, targetroot.Z - 0.5)
-                            char:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(targetroot.X - 1, targetroot.Y - -1, targetroot.Z + 0.5)
-                        end
                     end
                 end
             end)
