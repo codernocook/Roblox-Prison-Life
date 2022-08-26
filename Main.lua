@@ -477,7 +477,7 @@ if game.PlaceId == 155615604 then
                 }
                 
                 workspace.Remote.TeamEvent:FireServer(unpack(args))
-                task.wait(1)
+
                 if plr.Team == "Guards" then
                     ArrestStart()
                 end
@@ -544,6 +544,51 @@ if game.PlaceId == 155615604 then
         char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
     end)
 
+    PlayerController:NewButton("Trap", "Trap player you want into a building!", function()
+        local loadcharbefore = {
+            [1] = plr.Name
+        }
+
+        workspace.Remote.loadchar:InvokeServer(unpack(loadcharbefore))
+
+        local oldposbeforebring = char:WaitForChild("HumanoidRootPart").CFrame
+
+        local gunpickup = {
+            [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+        }
+
+        workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
+
+        task.wait(.1)
+
+        char:FindFirstChildWhichIsA("Humanoid"):Destroy()
+        Instance.new("Humanoid", char)
+
+        if plr.Backpack:FindFirstChild("Remington 870") then
+            plr.Backpack:WaitForChild("Remington 870").Parent = char
+        elseif char:FindFirstChild("Remington 870") then
+            task.wait()
+        elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
+            local args = {
+                [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+            }
+
+            workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+            plr.Backpack:WaitForChild("Remington 870").Parent = char
+        end
+        LoopTeleportBring = true
+        task.wait(.5)
+        LoopTeleportBring = false
+        char:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-328.772797, 84.2401199, 1953.56274, -0.774003625, 3.31737269e-08, -0.633181155, 4.14672492e-08, 1, 1.70239745e-09, 0.633181155, -2.49386201e-08, -0.774003625)
+        task.wait(.5)
+        local loadcharafter = {
+            [1] = plr.Name
+        }
+
+        workspace.Remote.loadchar:InvokeServer(unpack(loadcharafter))
+        task.wait(.1)
+        char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
+    end)
 
     PlayerController:NewToggle("Spectate", "Wiew player cam", function(state)
         if state then
