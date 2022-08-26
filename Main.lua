@@ -496,6 +496,55 @@ if game.PlaceId == 155615604 then
        end)
     end)
 
+    local LoopTeleportBring = false
+
+    PlayerController:NewButton("Bring", "Bring player you want to you!", function()
+        local loadcharbefore = {
+            [1] = plr.Name
+        }
+
+        workspace.Remote.loadchar:InvokeServer(unpack(loadcharbefore))
+
+        local oldposbeforebring = char:WaitForChild("HumanoidRootPart").CFrame
+
+        local gunpickup = {
+            [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+        }
+
+        workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
+
+        task.wait(.1)
+
+        char:FindFirstChildWhichIsA("Humanoid"):Destroy()
+        Instance.new("Humanoid", char)
+
+        if plr.Backpack:FindFirstChild("Remington 870") then
+            plr.Backpack:WaitForChild("Remington 870").Parent = char
+        elseif char:FindFirstChild("Remington 870") then
+            task.wait()
+        elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
+            local args = {
+                [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+            }
+
+            workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+            plr.Backpack:WaitForChild("Remington 870").Parent = char
+        end
+        LoopTeleportBring = true
+        task.wait(.5)
+        LoopTeleportBring = false
+        char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
+        task.wait(.5)
+        local loadcharafter = {
+            [1] = plr.Name
+        }
+
+        workspace.Remote.loadchar:InvokeServer(unpack(loadcharafter))
+        task.wait(.1)
+        char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
+    end)
+
+
     PlayerController:NewToggle("Spectate", "Wiew player cam", function(state)
         if state then
             if PlayerControll ~= nil then
@@ -707,6 +756,20 @@ if game.PlaceId == 155615604 then
                 if PlayerControll ~= nil then
                     if PlayerControll.Character then
                         char:WaitForChild("HumanoidRootPart").CFrame = PlayerControll.Character:WaitForChild("HumanoidRootPart").CFrame
+                    end
+                end
+            end)
+        end
+        
+        if LoopTeleportBring == true then
+            task.spawn(function()
+                if PlayerControll ~= nil then
+                    if PlayerControll.Character then
+                        local targetroot = PlayerControll.Character:WaitForChild("HumanoidRootPart").CFrame
+                        for i = 1, 5 do
+                            char:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(targetroot.X + 1, targetroot.Y + -1, targetroot.Z - 0.5)
+                            char:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(targetroot.X - 1, targetroot.Y - -1, targetroot.Z + 0.5)
+                        end
                     end
                 end
             end)
