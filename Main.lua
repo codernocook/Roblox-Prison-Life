@@ -276,7 +276,7 @@ if game.PlaceId == 155615604 then
         task.spawn(function()
             table.clear(PlayerInGame)
             for i, v in pairs(game:GetService("Players"):GetPlayers()) do
-               table.insert(PlayerInGame, v.Name)
+               table.insert(PlayerInGame, v.DisplayName)
             end
         end)
     end
@@ -285,10 +285,12 @@ if game.PlaceId == 155615604 then
     
     local PlayerControllerDropDown = PlayerController:NewDropdown("Select Player", "Choose Player you want to controll", PlayerInGame, function(plrselect)
         task.spawn(function()
-            if game:GetService("Players"):FindFirstChild(plrselect) then
-                PlayerControll = game:GetService("Players"):WaitForChild(plrselect)
-            else
-                PlayerControll = nil
+            for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                if tostring(v.DisplayName) == tostring(plrselect) then
+                    PlayerControll = v
+                else
+                    PlayerControll = PlayerControll or v
+                end
             end
         end)
     end)
