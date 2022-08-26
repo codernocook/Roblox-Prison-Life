@@ -147,6 +147,15 @@ if game.PlaceId == 155615604 then
             end
         end)
     end)
+
+    Team:NewButton("Black Team", "Turn you into black team so everyone thing you are hacker lol", function()
+        local args = {
+            [1] = plr,
+            [2] = "Really black"
+        }
+
+        workspace.Remote.loadchar:InvokeServer(unpack(args))
+    end)
     ----------
 
     --ItemTab--
@@ -436,30 +445,29 @@ if game.PlaceId == 155615604 then
         end)
     end)
 
-    local plrArrest = PlayerControll
-    local BeforeArrestOldpos
-    local OldTeamBeforeArrest
-
     PlayerController:NewButton("Arrest", "Arrest the player you want!", function()
        task.spawn(function()
-        if plrArrest ~= nil then
-            OldTeamBeforeArrest = plr.TeamColor
+        local BeforeArrestOldpos
+        local OldTeamBeforeArrest
+        if PlayerControll ~= nil then
+            OldTeamBeforeArrest = "Bright orange"
 
-            local function ArrestStart()
-                BeforeArrestOldpos = char:WaitForChild("HumanoidRootPart").Position
-                char:WaitForChild("HumanoidRootPart").Position = plrArrest.Character:WaitForChild("HumanoidRootPart").Position
+            if plr.Team == "Guards" then
+                BeforeArrestOldpos = char:WaitForChild("HumanoidRootPart").CFrame
+                LoopTeleportAllowed = true
                 local HandleArrest = {
-                    [1] = plrArrest.Character.Torso
+                    [1] = PlayerControll.Character.Head
                 }
                 
                 workspace.Remote.ItemHandler:InvokeServer(unpack(HandleArrest))
                 
                 local arrestremote = {
-                    [1] = plrArrest.Character.Torso
+                    [1] = PlayerControll.Character.Head
                 }
                 
                 workspace.Remote.arrest:InvokeServer(unpack(arrestremote))
-                char:WaitForChild("HumanoidRootPart").Position = BeforeArrestOldpos
+                LoopTeleportAllowed = false
+                char:WaitForChild("HumanoidRootPart").CFrame = BeforeArrestOldpos
                 if plr.TeamColor == OldTeamBeforeArrest then
                     task.wait()
                 else
@@ -469,30 +477,36 @@ if game.PlaceId == 155615604 then
                     
                     workspace.Remote.TeamEvent:FireServer(unpack(args))
                 end
-            end
-
-            if plr.Team == "Guards" then
-                ArrestStart()
             else
                 local args = {
                     [1] = "Bright blue"
                 }
                 
                 workspace.Remote.TeamEvent:FireServer(unpack(args))
-
-                if plr.Team == "Guards" then
-                    ArrestStart()
-                end
-            end
-
-            if plr.TeamColor == OldTeamBeforeArrest then
-                task.wait()
-            else
-                local args = {
-                    [1] = OldTeamBeforeArrest
+                BeforeArrestOldpos = char:WaitForChild("HumanoidRootPart").CFrame
+                LoopTeleportAllowed = true
+                local HandleArrest = {
+                    [1] = PlayerControll.Character.Head
                 }
                 
-                workspace.Remote.TeamEvent:FireServer(unpack(args))
+                workspace.Remote.ItemHandler:InvokeServer(unpack(HandleArrest))
+                
+                local arrestremote = {
+                    [1] = PlayerControll.Character.Head
+                }
+                
+                workspace.Remote.arrest:InvokeServer(unpack(arrestremote))
+                LoopTeleportAllowed = false
+                char:WaitForChild("HumanoidRootPart").CFrame = BeforeArrestOldpos
+                if plr.TeamColor == OldTeamBeforeArrest then
+                    task.wait()
+                else
+                    local args = {
+                        [1] = OldTeamBeforeArrest
+                    }
+                    
+                    workspace.Remote.TeamEvent:FireServer(unpack(args))
+                end
             end
            end
        end)
