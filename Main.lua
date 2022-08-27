@@ -131,7 +131,7 @@ if game.PlaceId == 155615604 then
 
     Team:NewButton("Criminals", "Change your team to Criminals", function()
         task.spawn(function()
-            if plr.Team == "Guards" or plr.Team == "Neutral" then
+            if plr.Team == "Guards" or plr.Team == "Neutral" or plr.Team == "Criminals" or plr.Team == nil or plr.Team == "" then
                 local args = {
                     [1] = "Bright orange"
                 }
