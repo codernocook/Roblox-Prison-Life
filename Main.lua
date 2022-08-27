@@ -149,12 +149,18 @@ if game.PlaceId == 155615604 then
     end)
 
     Team:NewButton("Black Team", "Turn you into black team so everyone thing you are hacker lol", function()
-        local args = {
-            [1] = plr,
-            [2] = "Really black"
-        }
+        task.spawn(function()
+            local oldpos = char:WaitForChild("HumanoidRootPart").CFrame
+            task.wait(.1)
+            local args = {
+                [1] = plr,
+                [2] = "Really black"
+            }
 
-        workspace.Remote.loadchar:InvokeServer(unpack(args))
+            workspace.Remote.loadchar:InvokeServer(unpack(args))
+            task.wait(.1)
+            char:WaitForChild("HumanoidRootPart").CFrame = oldpos
+        end)
     end)
     ----------
 
