@@ -628,6 +628,10 @@ if game.PlaceId == 155615604 then
     PlayerController:NewButton("Teleport", "Teleport to selected player!", function()
         task.spawn(function()
             if PlayerControll ~= nil then
+                if Humanoid and Humanoid.Sit == true then
+                    Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                end
+                task.wait(.1)
                 char:WaitForChild("HumanoidRootPart").CFrame = PlayerControll.Character:WaitForChild("HumanoidRootPart").CFrame
             end
         end)
@@ -793,6 +797,9 @@ if game.PlaceId == 155615604 then
             task.spawn(function()
                 if PlayerControll ~= nil then
                     if PlayerControll.Character then
+                        if Humanoid and Humanoid.Sit == true then
+                            Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                         end
                         char:WaitForChild("HumanoidRootPart").CFrame = PlayerControll.Character:WaitForChild("HumanoidRootPart").CFrame
                     end
                 end
