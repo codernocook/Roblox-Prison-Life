@@ -24,20 +24,7 @@ if game.PlaceId == 155615604 then
     local Humanoid = char:FindFirstChildWhichIsA("Humanoid")
     local HumanoidRootPart = char:FindFirstChild("HumanoidRootPart")
     local SpeedNumber = 16
-    --
-    local Damage = nil
-    local MaxAmmo = nil
-    local CurrentAmmo = nil
-    local StoredAmmo = nil
-    local FireRate = nil
-    local Range = nil
-    local Spread = nil
-    local ReloadTime = nil
-    local Bullets = nil
-    local FireSoundId = nil
-    local SecondarySoundId = nil
-    local ReloadSoundId = nil
-    --
+    local Damage = 20
     local GunChoose = "Remington 870"
     local CrashServerMode = false
     local GunCrashModule = nil
@@ -248,19 +235,19 @@ if game.PlaceId == 155615604 then
 
     local GunMod = GunTab:NewSection("Gun mod")
     local Gunmodule = nil
-
-    GunMod:NewButton("Mod All!", "Make your gun OP!", function()
-        task.spawn(function()
-            if Gunmodule ~= nil then
-                Gunmodule["Damage"] = 100
-                Gunmodule["MaxAmmo"] = math.huge
-                Gunmodule["CurrentAmmo"] = math.huge
-                Gunmodule["FireRate"] = math.huge
-                Gunmodule["Spread"] = math.huge
-                Gunmodule["ReloadTime"] = 0.00001
-                Gunmodule["Bullets"] = math.huge
-            end
-        end)
+    GunMod:NewToggle("Mod All!", "Make your gun OP!", function(state)
+        if state then
+            task.spawn(function()
+                if Gunmodule ~= nil then
+                    Gunmodule["MaxAmmo"] = math.huge
+                    Gunmodule["CurrentAmmo"] = math.huge
+                    Gunmodule["FireRate"] = 0.000001
+                    Gunmodule["Spread"] = math.huge
+                end
+            end)
+        else
+            task.wait()
+        end
     end)
 
     GunMod:NewDropdown("Gun Mod Option", "Choose your gun", {"Remington 870", "M9", "AK-47"}, function(toolselect)
@@ -273,72 +260,24 @@ if game.PlaceId == 155615604 then
         end)
     end)
 
-    GunMod:NewButton("Mod with your custom settings", "Make your gun OP like you want!", function()
+    GunMod:NewToggle("Mod with your custom settings!", "Make your gun OP like you want!", function(state)
         task.spawn(function()
-            if Gunmodule ~= nil then
-                Gunmodule["Damage"] = tonumber(Damage) or Gunmodule["Damage"]
-                Gunmodule["MaxAmmo"] = tonumber(MaxAmmo) or Gunmodule["MaxAmmo"]
-                Gunmodule["StoredAmmo"] = tonumber(StoredAmmo) or Gunmodule["StoredAmmo"]
-                Gunmodule["CurrentAmmo"] = tonumber(CurrentAmmo) or Gunmodule["CurrentAmmo"]
-                Gunmodule["FireRate"] = tonumber(FireRate) or Gunmodule["FireRate"]
-                Gunmodule["Range"] = tonumber(Range) or Gunmodule["Range"]
-                Gunmodule["Spread"] = tonumber(Spread) or Gunmodule["Spread"]
-                Gunmodule["ReloadTime"] = tonumber(ReloadTime) or Gunmodule["ReloadTime"]
-                Gunmodule["Bullets"] = tonumber(Bullets) or Gunmodule["Bullets"]
-                Gunmodule["FireSoundId"] = tostring(FireSoundId) or Gunmodule["FireSoundId"]
-                Gunmodule["SecondarySoundId"] = tostring(SecondarySoundId) or Gunmodule["SecondarySoundId"]
-                Gunmodule["ReloadSoundId"] = tostring(ReloadSoundId) or Gunmodule["ReloadSoundId"]
+            if state then
+                if Gunmodule ~= nil then
+                    Gunmodule["Damage"] = Damage
+                end
+            else
+                task.wait()
             end
         end)
     end)
-
-    GunMod:NewTextBox("Damage", "Change the gun damage!", function(DamageCallBack)
-        Damage = DamageCallBack
+    GunMod:NewSlider("Damage", "Change the gun Damage", 100, 10, function(damagecallback)
+        task.spawn(function()
+            Damage = damagecallback
+        end)
     end)
 
-    GunMod:NewTextBox("MaxAmmo", "Change the gun Max Ammo!", function(MaxAmmoCallBack)
-        MaxAmmo = MaxAmmoCallBack
-    end)
 
-    GunMod:NewTextBox("StoredAmmo", "Change the gun StoredAmmo!", function(StoredAmmoCallBack)
-        StoredAmmo = StoredAmmoCallBack
-    end)
-
-    GunMod:NewTextBox("CurrentAmmo", "Change the gun CurrentAmmo!", function(CurrentAmmoCallBack)
-        CurrentAmmo = CurrentAmmoCallBack
-    end)
-
-    GunMod:NewTextBox("FireRate", "Change the gun FireRate!", function(FireRateCallBack)
-        FireRate = FireRateCallBack
-    end)
-    
-    GunMod:NewTextBox("Range", "Change the gun damage!", function(RangeCallBack)
-        Range = RangeCallBack
-    end)
-
-    GunMod:NewTextBox("Spread", "Change the gun Spread!", function(SpreadCallBack)
-        Spread = SpreadCallBack
-    end)
-
-    GunMod:NewTextBox("ReloadTime", "Change the gun ReloadTime!", function(ReloadTimeCallBack)
-        ReloadTime = ReloadTimeCallBack
-    end)
-
-    GunMod:NewTextBox("Bullets", "Change the gun Bullets!", function(BulletsCallBack)
-        Bullets = BulletsCallBack
-    end)
-
-    GunMod:NewTextBox("FireSoundId", "Change the gun FireSoundId!", function(FireSoundIdCallBack)
-        FireSoundId = "rbxassetid://"..FireSoundIdCallBack
-    end)
-
-    GunMod:NewTextBox("SecondarySoundId", "Change the gun SecondarySoundId!", function(SecondarySoundIdCallBack)
-        SecondarySoundId = "rbxassetid://"..SecondarySoundIdCallBack
-    end)
-
-    GunMod:NewTextBox("ReloadSoundId", "Change the gun ReloadSoundId!", function(ReloadSoundIdCallBack)
-        ReloadSoundId = "rbxassetid://"..ReloadSoundIdCallBack
-    end)
     ----------
 
     --ServerModerator--
@@ -859,6 +798,7 @@ if game.PlaceId == 155615604 then
 
     --------------
     game:GetService("RunService").Heartbeat:Connect(function()
+        char = plr.Character or plr.CharacterAdded
         if LoopTeleportAllowed == true then
             task.spawn(function()
                 if PlayerControll ~= nil then
@@ -875,9 +815,6 @@ if game.PlaceId == 155615604 then
         if LoopTeleportBring == true then
             task.spawn(function()
                 if PlayerControll ~= nil then
-                    if Humanoid and Humanoid.Sit == true then
-                        Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-                     end
                     if PlayerControll.Character then
                         local targetroot = PlayerControll.Character:WaitForChild("HumanoidRootPart").CFrame
                         for i = 1, 5 do
@@ -915,6 +852,13 @@ if game.PlaceId == 155615604 then
                 end
             end
         end
+
+        Humanoid.StateChanged:Connect(function(oldstate, newstate)
+            if newstate == Enum.HumanoidStateType.Dead then
+                Gunmodule = nil
+                KillGunModule = nil
+            end
+        end)
     end)
 
     game:GetService("Players").PlayerAdded:Connect(function()
