@@ -572,7 +572,7 @@ if game.PlaceId == 155615604 then
                 local function flingem(TargetPlayer)
                     local Character = char
                     local Humanoid = char and Humanoid
-                    local RootPart = Humanoid and Humanoid.RootPart
+                    local RootPart = char and HumanoidRootPart
 
                     local TCharacter = TargetPlayer.Character
                     local THumanoid
