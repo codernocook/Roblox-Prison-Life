@@ -12,7 +12,7 @@ if game.PlaceId == 155615604 then
 
     --Tab--
     local PlayerTab = ScriptWindows:NewTab("Player")
-    local ItemTab = ScriptWindows:NewTab("Item")
+    local BlatantTab = ScriptWindows:NewTab("Blatant")
     local GunTab = ScriptWindows:NewTab("Gun")
     local ServerModerator = ScriptWindows:NewTab("ServerMod")
     local ExploitTab = ScriptWindows:NewTab("Exploit")
@@ -164,10 +164,10 @@ if game.PlaceId == 155615604 then
     end)
     ----------
 
-    --ItemTab--
-        local GiveItem = ItemTab:NewSection("Give Item")
+    --BlatantTab--
+        local GiveItem = BlatantTab:NewSection("Give Item")
         
-        GiveItem:NewButton("Give All Item", "Get all of Item in Jailbreak i don't think it will work", function()
+        GiveItem:NewButton("Give All Item", "Get all of Item in Prison Life i don't think it will work", function()
             task.spawn(function()
                 for i, v in pairs(game:GetService("Workspace"):WaitForChild("Prison_ITEMS"):WaitForChild("single"):GetChildren()) do
                     local args = {
@@ -185,6 +185,22 @@ if game.PlaceId == 155615604 then
                 end
             end)
         end)
+
+        local KillAura = BlatantTab:NewSection("Kill Aura")
+        local KillAuraToggle = false
+
+        KillAura:NewToggle("Toggle", "Punch someone near you", function(state)
+            if state then
+                task.spawn(function()
+                    KillAuraToggle = state
+                end)
+            else
+                task.spawn(function()
+                    KillAuraToggle = state
+                end)
+            end
+        end)
+
     -----------
 
     --GunTab--
@@ -371,7 +387,6 @@ if game.PlaceId == 155615604 then
 
     PlayerController:NewButton("InstaKill", "Fix Kill Problem and kill player you want!", function()
         task.spawn(function()
-            local lastposInstakill = char:WaitForChild("HumanoidRootPart").Position
             local NeutralTeamSwitch = {
                 [1] = "Medium stone grey"
             }
@@ -383,11 +398,15 @@ if game.PlaceId == 155615604 then
             }
             
             workspace.Remote.TeamEvent:FireServer(unpack(InmatesTeamSwitch))
+            local lastposInstakill = HumanoidRootPart.CFrame
+            lastposInstakill = HumanoidRootPart.CFrame
         local loadchar = {
             [1] = plr.Name
         }
         
         workspace.Remote.loadchar:InvokeServer(unpack(loadchar))
+
+        HumanoidRootPart.CFrame = lastposInstakill
 
         if SpectateStatus == true then
             if PlayerControll.Character then
@@ -395,8 +414,6 @@ if game.PlaceId == 155615604 then
                 SpectateStatus = true
             end
         end
-
-        char:WaitForChild("HumanoidRootPart").Position = lastposInstakill
 
         if plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
             task.wait()
@@ -842,6 +859,26 @@ if game.PlaceId == 155615604 then
            end)
         end
 
+        if KillAuraToggle == true then
+            task.spawn(function()
+                for i, v in pairs(game:GetService("Players"):GetPlayers()) do
+                    if v ~= plr then
+                        if v.Character then
+                            if v.Character:FindFirstChild("HumanoidRootPart") then
+                                if (v.Character:WaitForChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 20 then
+                                    local args = {
+                                        [1] = v
+                                    }
+                
+                                    game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                                end
+                            end
+                        end
+                    end
+                 end
+            end)
+        end
+
         if RemoteAllDoorLoop == true then
             for i, v in pairs(game:GetService("Workspace"):WaitForChild("Doors"):GetChildren()) do
                 if v:FindFirstChild("block") then
@@ -852,13 +889,6 @@ if game.PlaceId == 155615604 then
                 end
             end
         end
-
-        Humanoid.StateChanged:Connect(function(oldstate, newstate)
-            if newstate == Enum.HumanoidStateType.Dead then
-                Gunmodule = nil
-                KillGunModule = nil
-            end
-        end)
     end)
 
     game:GetService("Players").PlayerAdded:Connect(function()
