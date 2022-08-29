@@ -326,13 +326,15 @@ if game.PlaceId == 155615604 then
         end)
     end)
 
+    local KillPunch = false
+
     PlayerController:NewButton("Kill", "Kill player you want!", function()
         task.spawn(function()
             local plrlastteam = nil
 
         if plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
             task.wait()
-        else
+        else     
             local args = {
                 [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
             }
@@ -381,6 +383,13 @@ if game.PlaceId == 155615604 then
             
             game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
             game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
+            PlayerControll.Character:FindFirstChildWhichIsA("Humanoid").StateChanged:Connect(function(oldstate, newstate)
+                if newstate ~= Enum.HumanoidStateType.Dead then
+                    KillPunch = true
+                    task.wait(.5)
+                    KillPunch = false
+                end
+            end)
         end
         end)
     end)
@@ -464,8 +473,25 @@ if game.PlaceId == 155615604 then
             
             game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
             game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
+            PlayerControll.Character:FindFirstChildWhichIsA("Humanoid").StateChanged:Connect(function(oldstate, newstate)
+                if newstate ~= Enum.HumanoidStateType.Dead then
+                    KillPunch = true
+                    task.wait(.5)
+                    KillPunch = false
+                end
+            end)
         end
         end)
+    end)
+
+    PlayerController:NewButton("Punch", "Punch Player you want!", function()
+        if PlayerControll ~= nil then
+            local args = {
+                [1] = PlayerControll
+            }
+
+            game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+        end
     end)
 
     PlayerController:NewButton("Arrest", "Arrest the player you want!", function()
@@ -877,6 +903,16 @@ if game.PlaceId == 155615604 then
                     end
                  end
             end)
+        end
+
+        if KillPunch == true then
+            if PlayerControll ~= nil then
+                local args = {
+                    [1] = PlayerControll
+                }
+    
+                game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+            end
         end
 
         if RemoteAllDoorLoop == true then
