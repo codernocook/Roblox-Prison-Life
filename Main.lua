@@ -47,6 +47,46 @@ if game.PlaceId == 155615604 then
     end)    
 
     --PlayerTab
+    local Fly = PlayerTab:NewSection("Fly")
+    Fly:NewToggle("Toggle", "Make you character Fly.", function(state)
+        if state then
+            local uis = game:GetService("UserInputService")
+            local floatName = "Flydude"
+            local Tpwalkspeed = 50
+            local Float = Instance.new("Part", char)
+            Float.Name = floatName
+            Float.Transparency = 1
+            Float.Size = Vector3.new(2,0.2,1.5)
+            Float.Anchored = true
+            local FloatValue = -3.1
+            Float.CFrame = char:WaitForChild("HumanoidRootPart").CFrame * CFrame.new(0, FloatValue, 0)
+            game:GetService("RunService").Heartbeat:Connect(function()
+                Float.CFrame = char:WaitForChild("HumanoidRootPart").CFrame * CFrame.new(0, FloatValue, 0)
+            end)
+                task.spawn(function()
+                        uis.InputBegan:Connect(function(key)
+                            if state == true then
+                                if key.KeyCode == Enum.KeyCode.LeftShift then
+                                    FloatValue -= 0.5
+                                end
+                            end
+                        end)
+
+                        uis.InputEnded:Connect(function(key)
+                            if state == true then
+                                if key.KeyCode == Enum.KeyCode.LeftShift then
+                                    FloatValue += 0.5
+                                end
+                            end
+                        end)
+                end)
+            else
+                if char:FindFirstChild("Flydude") then
+                    char:WaitForChild("Flydude"):Destroy()
+                end
+        end
+    end)
+    --
     local Speed = PlayerTab:NewSection("Speed")
     Speed:NewToggle("Toggle", "Improve your movement.", function(state)
         if state then
@@ -894,6 +934,7 @@ if game.PlaceId == 155615604 then
                         if v.Character then
                             if v.Character:FindFirstChild("HumanoidRootPart") then
                                 if (v.Character:WaitForChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 20 then
+                                    task.wait(.5)
                                     local args = {
                                         [1] = v
                                     }
