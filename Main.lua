@@ -486,11 +486,13 @@ if game.PlaceId == 155615604 then
 
     PlayerController:NewButton("Punch", "Punch Player you want!", function()
         if PlayerControll ~= nil then
+            LoopTeleportAllowed = true
             local args = {
                 [1] = PlayerControll
             }
 
             game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+            LoopTeleportAllowed = false
         end
     end)
 
