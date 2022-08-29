@@ -601,7 +601,7 @@ if game.PlaceId == 155615604 then
                     if Character and Humanoid and RootPart then
                         --workspace.FallenPartsDestroyHeight =
                         if RootPart.Velocity.Magnitude < 50 then
-                            OldPos = RootPart.CFrame
+                            OldPos = HumanoidRootPart.CFrame
                         end
                         if THumanoid and THumanoid.Sit and not AllBool then
                             CreateNotification("Can't fling Player Selected!") -- u can remove dis part if u want lol
@@ -771,7 +771,7 @@ if game.PlaceId == 155615604 then
                         workspace.CurrentCamera.CameraSubject = Humanoid
 
                         repeat
-                            RootPart.CFrame = OldPos * CFrame.new(0, .5, 0)
+                            HumanoidRootPart.CFrame = OldPos * CFrame.new(0, .5, 0)
                             Character:SetPrimaryPartCFrame(OldPos * CFrame.new(0, .5, 0))
                             Humanoid:ChangeState("GettingUp")
                             table.foreach(
@@ -869,95 +869,99 @@ if game.PlaceId == 155615604 then
     local LoopTeleportBring = false
 
     PlayerController:NewButton("Bring", "Bring player you want to you!", function()
-        local loadcharbefore = {
-            [1] = plr.Name
-        }
-
-        workspace.Remote.loadchar:InvokeServer(unpack(loadcharbefore))
-
-        local oldposbeforebring = HumanoidRootPart.CFrame
-
-        local gunpickup = {
-            [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
-        }
-
-        workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
-
-        task.wait(.1)
-
-        char:FindFirstChildWhichIsA("Humanoid"):Destroy()
-        Instance.new("Humanoid", char)
-
-        if plr.Backpack:FindFirstChild("Remington 870") then
-            plr.Backpack:WaitForChild("Remington 870").Parent = char
-        elseif char:FindFirstChild("Remington 870") then
-            task.wait()
-        elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-            local args = {
+        task.spawn(function()
+            local loadcharbefore = {
+                [1] = plr.Name
+            }
+    
+            workspace.Remote.loadchar:InvokeServer(unpack(loadcharbefore))
+    
+            local oldposbeforebring = HumanoidRootPart.CFrame
+    
+            local gunpickup = {
                 [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
             }
-
-            workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-            plr.Backpack:WaitForChild("Remington 870").Parent = char
-        end
-        LoopTeleportBring = true
-        task.wait(.5)
-        LoopTeleportBring = false
-        HumanoidRootPart.CFrame = oldposbeforebring
-        task.wait(.5)
-        local loadcharafter = {
-            [1] = plr.Name
-        }
-
-        workspace.Remote.loadchar:InvokeServer(unpack(loadcharafter))
-        task.wait(.1)
-        HumanoidRootPart.CFrame = oldposbeforebring
+    
+            workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
+    
+            task.wait(.1)
+    
+            char:FindFirstChildWhichIsA("Humanoid"):Destroy()
+            Instance.new("Humanoid", char)
+    
+            if plr.Backpack:FindFirstChild("Remington 870") then
+                plr.Backpack:WaitForChild("Remington 870").Parent = char
+            elseif char:FindFirstChild("Remington 870") then
+                task.wait()
+            elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
+                local args = {
+                    [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+                }
+    
+                workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+                plr.Backpack:WaitForChild("Remington 870").Parent = char
+            end
+            LoopTeleportBring = true
+            task.wait(.5)
+            LoopTeleportBring = false
+            HumanoidRootPart.CFrame = oldposbeforebring
+            task.wait(.5)
+            local loadcharafter = {
+                [1] = plr.Name
+            }
+    
+            workspace.Remote.loadchar:InvokeServer(unpack(loadcharafter))
+            task.wait(.1)
+            HumanoidRootPart.CFrame = oldposbeforebring
+        end)
     end)
 
     PlayerController:NewButton("Trap", "Trap player you want into a building!", function()
-        local loadcharbefore = {
-            [1] = plr.Name
-        }
-
-        workspace.Remote.loadchar:InvokeServer(unpack(loadcharbefore))
-
-        local oldposbeforebring = HumanoidRootPart.CFrame
-
-        local gunpickup = {
-            [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
-        }
-
-        workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
-
-        task.wait(.1)
-
-        char:FindFirstChildWhichIsA("Humanoid"):Destroy()
-        Instance.new("Humanoid", char)
-
-        if plr.Backpack:FindFirstChild("Remington 870") then
-            plr.Backpack:WaitForChild("Remington 870").Parent = char
-        elseif char:FindFirstChild("Remington 870") then
-            task.wait()
-        elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-            local args = {
+        task.spawn(function()
+            local loadcharbefore = {
+                [1] = plr.Name
+            }
+    
+            workspace.Remote.loadchar:InvokeServer(unpack(loadcharbefore))
+    
+            local oldposbeforebring = HumanoidRootPart.CFrame
+    
+            local gunpickup = {
                 [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
             }
-
-            workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-            plr.Backpack:WaitForChild("Remington 870").Parent = char
-        end
-        LoopTeleportBring = true
-        task.wait(.5)
-        LoopTeleportBring = false
-        HumanoidRootPart.CFrame = CFrame.new(-328.772797, 84.2401199, 1953.56274, -0.774003625, 3.31737269e-08, -0.633181155, 4.14672492e-08, 1, 1.70239745e-09, 0.633181155, -2.49386201e-08, -0.774003625)
-        task.wait(.5)
-        local loadcharafter = {
-            [1] = plr.Name
-        }
-
-        workspace.Remote.loadchar:InvokeServer(unpack(loadcharafter))
-        task.wait(.1)
-        HumanoidRootPart.CFrame = oldposbeforebring
+    
+            workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
+    
+            task.wait(.1)
+    
+            char:FindFirstChildWhichIsA("Humanoid"):Destroy()
+            Instance.new("Humanoid", char)
+    
+            if plr.Backpack:FindFirstChild("Remington 870") then
+                plr.Backpack:WaitForChild("Remington 870").Parent = char
+            elseif char:FindFirstChild("Remington 870") then
+                task.wait()
+            elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
+                local args = {
+                    [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+                }
+    
+                workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+                plr.Backpack:WaitForChild("Remington 870").Parent = char
+            end
+            LoopTeleportBring = true
+            task.wait(.5)
+            LoopTeleportBring = false
+            HumanoidRootPart.CFrame = CFrame.new(-328.772797, 84.2401199, 1953.56274, -0.774003625, 3.31737269e-08, -0.633181155, 4.14672492e-08, 1, 1.70239745e-09, 0.633181155, -2.49386201e-08, -0.774003625)
+            task.wait(.5)
+            local loadcharafter = {
+                [1] = plr.Name
+            }
+    
+            workspace.Remote.loadchar:InvokeServer(unpack(loadcharafter))
+            task.wait(.1)
+            HumanoidRootPart.CFrame = oldposbeforebring
+        end)
     end)
 
     local SpectateConnection = nil
@@ -1185,7 +1189,7 @@ if game.PlaceId == 155615604 then
                         if Humanoid and Humanoid.Sit == true then
                             Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
                          end
-                        HumanoidRootPart.CFrame = PlayerControll.Character:FindFirstChild("HumanoidRootPart").CFrame or PlayerControll.Character:FindFirstChild("Torso").CFrame
+                        HumanoidRootPart.CFrame = PlayerControll.Character:FindFirstChild("HumanoidRootPart").CFrame
                     end
                 end
             end)
@@ -1195,7 +1199,7 @@ if game.PlaceId == 155615604 then
             task.spawn(function()
                 if PlayerControll ~= nil then
                     if PlayerControll.Character then
-                        local targetroot = PlayerControll.Character:FindFirstChild("HumanoidRootPart").CFrame or PlayerControll.Character:FindFirstChild("Torso").CFrame
+                        local targetroot = PlayerControll.Character:FindFirstChild("HumanoidRootPart").CFrame
                         for i = 1, 5 do
                             HumanoidRootPart.CFrame = CFrame.new(targetroot.X + 1, targetroot.Y + -1, targetroot.Z - 0.5)
                             HumanoidRootPart.CFrame = CFrame.new(targetroot.X - 1, targetroot.Y - -1, targetroot.Z + 0.5)
@@ -1210,7 +1214,7 @@ if game.PlaceId == 155615604 then
                 for i, v in pairs(game:GetService("Players"):GetPlayers()) do
                     if v ~= plr then
                         if v.Character then
-                            if 0 - (v.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude or v.Character:FindFirstChild("Torso").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 20 then
+                            if 0 - (v.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 20 then
                                 task.wait(.5)
                                 local args = {
                                     [1] = v
