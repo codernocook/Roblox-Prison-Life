@@ -526,6 +526,7 @@ if game.PlaceId == 155615604 then
 
     PlayerController:NewButton("Punch", "Punch Player you want!", function()
         if PlayerControll ~= nil then
+            
             LoopTeleportAllowed = true
             local args = {
                 [1] = PlayerControll
@@ -950,11 +951,25 @@ if game.PlaceId == 155615604 then
 
         if KillPunch == true then
             if PlayerControll ~= nil then
-                local args = {
-                    [1] = PlayerControll
-                }
-    
-                game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                if PlayerControll.Character:FindFirstChild("HumanoidRootPart") then
+                    if (PlayerControll.Character:WaitForChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 50 then
+                        local args = {
+                            [1] = PlayerControll
+                        }
+            
+                        game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                    else
+                        LoopTeleportAllowed = true
+                        task.wait(.1)
+                        local args = {
+                            [1] = PlayerControll
+                        }
+            
+                        game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                        task.wait(.1)
+                        LoopTeleportAllowed = false
+                    end
+                end
             end
         end
 
