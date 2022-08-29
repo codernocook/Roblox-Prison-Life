@@ -67,6 +67,7 @@ if game.PlaceId == 155615604 then
     local Fly = PlayerTab:NewSection("Fly")
     Fly:NewToggle("Toggle", "Make you character Fly.", function(state)
         if state then
+          task.spawn(function()
             local uis = game:GetService("UserInputService")
             local floatName = "Flydude"
             local Tpwalkspeed = 50
@@ -97,10 +98,13 @@ if game.PlaceId == 155615604 then
                             end
                         end)
                 end)
+          end)
             else
-                if char:FindFirstChild("Flydude") then
-                    char:WaitForChild("Flydude"):Destroy()
-                end
+                task.spawn(function()
+                    if char:FindFirstChild("Flydude") then
+                        char:WaitForChild("Flydude"):Destroy()
+                    end
+                end)
         end
     end)
     --
@@ -108,23 +112,11 @@ if game.PlaceId == 155615604 then
     Speed:NewToggle("Toggle", "Improve your movement.", function(state)
         if state then
             task.spawn(function()
-                tpwalking = true
-                local chr = char
-	            local hum = chr and Humanoid
-	                while tpwalking and Heartbeat:Wait() and chr and hum and hum.Parent do
-		                 if hum.MoveDirection.Magnitude > 0 then
-			                if hum.MoveDirection.Magnitude > 0 then
-                                chr:TranslateBy(hum.MoveDirection * tonumber(SpeedNumber / 200))
-                            else
-                                chr:TranslateBy(hum.MoveDirection)
-                            end
-		                end
-	                end
+                Humanoid.WalkSpeed = state
             end)
         else
             task.spawn(function()
                 Humanoid.WalkSpeed = 16
-                tpwalking = false
             end)
         end
     end)
@@ -538,7 +530,7 @@ if game.PlaceId == 155615604 then
     PlayerController:NewButton("Punch", "Punch Player you want!", function()
         task.spawn(function()
             if PlayerControll ~= nil then
-                if 0 - (PlayerControll.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 20 then
+                if (0 - (PlayerControll.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude)) < 20 then
                     local args = {
                         [1] = PlayerControll
                     }
@@ -1231,7 +1223,7 @@ if game.PlaceId == 155615604 then
         if KillPunch == true then
             if PlayerControll ~= nil then
                 if PlayerControll.Character:FindFirstChild("HumanoidRootPart") then
-                    if 0 - (PlayerControll.Character:WaitForChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 20 then
+                    if (0 - (PlayerControll.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude)) < 20 then
                         local args = {
                             [1] = PlayerControll
                         }
