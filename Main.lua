@@ -855,30 +855,54 @@ if game.PlaceId == 155615604 then
         end
     end)
 
-    local InstantRespawn = ExploitTab:NewSection("InstantRespawn")
+    local GodMode = ExploitTab:NewSection("GodMode")
 
-    local function RespawnPlayer(newstate)
-        if newstate == Enum.HumanoidStateType.Dead then
+    GodMode:NewToggle("GodMode", "Turn you into god!", function(state)
+        if state then
+            task.spawn(function()
+                local RunService = game:GetService("RunService");
+                local Players = game:GetService("Players");
+                local LocalPlayer = game:GetService("Players").LocalPlayer; 
+                local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait();
+                local Humanoid = Character:WaitForChild("Humanoid") or Character:FindFirstChildOfClass("Humanoid");
+                local HRP = Humanoid.RootPart or Humanoid:FindFirstChild("HumanoidRootPart")
+                
+                -- Check
+                if not Humanoid or not state then
+                if Humanoid and Humanoid.Health <= 0 then
+                    Humanoid:Destroy()
+                end
+                return
+                end
+                
+                -- Setting Up Humanoid
+                Humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+                Humanoid.BreakJointsOnDeath = false
+                Humanoid.RequiresNeck = false
+                
+                local con; con = RunService.Stepped:Connect(function()
+                if not Humanoid then return con:Disconnect() end
+                Humanoid:ChangeState(Enum.HumanoidStateType.Landed)
+                end)
+                
+                LocalPlayer.Character = nil
+                LocalPlayer.Character = Character
+                task.wait(Players.RespawnTime + 0.1)
+                
+                while task.wait(110) do
+                Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+                HRP.Died.SoundId = ""
+                end
+            end)
+        else
+            local oldpos = HumanoidRootPart.CFrame
             local args = {
                 [1] = plr.Name
             }
             
             workspace.Remote.loadchar:InvokeServer(unpack(args))
-            task.wait(game:GetService("Players").RespawnTime)
-            RespawnPlayer()
-        end
-    end
-
-    InstantRespawn:NewToggle("Toggle", "Respawn you char instantly!", function(state)
-        if state then
-           repeat
-            task.wait()
-            Humanoid.StateChanged:Connect(function(oldstate, newstate)
-                RespawnPlayer(newstate)
-            end)
-           until state == false
-        else
-            state = false
+            task.wait(.1)
+            HumanoidRootPart.CFrame = oldpos
         end
     end)
 
