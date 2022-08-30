@@ -102,7 +102,7 @@ if game.PlaceId == 155615604 then
             else
                 task.spawn(function()
                     if char:FindFirstChild("Flydude") then
-                        char:WaitForChild("Flydude"):Destroy()
+                        char:FindFirstChild("Flydude"):Destroy()
                     end
                 end)
         end
@@ -763,8 +763,8 @@ if game.PlaceId == 155615604 then
                         workspace.CurrentCamera.CameraSubject = Humanoid
 
                         repeat
-                            HumanoidRootPart.CFrame = OldPos * CFrame.new(0, .5, 0)
-                            Character:SetPrimaryPartCFrame(OldPos * CFrame.new(0, .5, 0))
+                            HumanoidRootPart.CFrame = OldPos * CFrame.new(0, 0.5, 0)
+                            Character:SetPrimaryPartCFrame(OldPos * CFrame.new(0, 0.5, 0))
                             Humanoid:ChangeState("GettingUp")
                             table.foreach(
                                 Character:GetChildren(),
@@ -780,16 +780,12 @@ if game.PlaceId == 155615604 then
                         return CreateNotification("Can't fling player selected maybe script issue bruh")
                     end
             end
-                if AllBool == true then
-                    for _, x in next, game:GetService("Players"):GetPlayers() do
-                        flingem(x)
-                    end
-                else
-                    flingem(TargetPlayer)
-                end
+
+            flingem(TargetPlayer)
             end
         end)
     end)
+
 
     PlayerController:NewButton("Arrest", "Arrest the player you want!", function()
        task.spawn(function()
@@ -878,7 +874,7 @@ if game.PlaceId == 155615604 then
     
             task.wait(.1)
     
-            char:FindFirstChildWhichIsA("Humanoid"):Destroy()
+            Humanoid:Destroy()
             Instance.new("Humanoid", char)
     
             if plr.Backpack:FindFirstChild("Remington 870") then
@@ -926,7 +922,7 @@ if game.PlaceId == 155615604 then
     
             task.wait(.1)
     
-            char:FindFirstChildWhichIsA("Humanoid"):Destroy()
+            Humanoid:Destroy()
             Instance.new("Humanoid", char)
     
             if plr.Backpack:FindFirstChild("Remington 870") then
@@ -1206,7 +1202,7 @@ if game.PlaceId == 155615604 then
                 for i, v in pairs(game:GetService("Players"):GetPlayers()) do
                     if v ~= plr then
                         if v.Character then
-                            if 0 - (v.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 20 then
+                            if (0 - (v.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude)) < 20 then
                                 task.wait(.5)
                                 local args = {
                                     [1] = v
