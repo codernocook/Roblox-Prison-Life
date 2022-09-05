@@ -29,7 +29,6 @@ if game.PlaceId == 155615604 then
     local CrashServerMode = false
     local GunCrashModule = nil
     local GunCrashChoose = "Remington 870"
-    local tpwalking = false
     local Heartbeat = game:GetService("RunService").Heartbeat
     local PlayerInGame = {}
     local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
@@ -88,26 +87,22 @@ if game.PlaceId == 155615604 then
     end)
     --
     local Speed = PlayerTab:NewSection("Speed")
+    local SpeedEnabled = false
     Speed:NewToggle("Toggle", "Improve your movement.", function(state)
         if state then
             task.spawn(function()
-                tpwalking = true
-                local chr = char
-	            local hum = chr and Humanoid
-	                while tpwalking and Heartbeat:Wait() and chr and hum and hum.Parent do
-		                 if hum.MoveDirection.Magnitude > 0 then
-			                if hum.MoveDirection.Magnitude > 0 then
-                                chr:TranslateBy(hum.MoveDirection * tonumber(SpeedNumber / 200))
-                            else
-                                chr:TranslateBy(hum.MoveDirection)
-                            end
-		                end
-	                end
+                SpeedEnabled = true
+                repeat task.wait(.1)
+                    Humanoid.WalkSpeed = tonumber(SpeedNumber)
+                    if SpeedEnabled == false then
+                        break
+                    end
+                until SpeedEnabled == false
             end)
         else
             task.spawn(function()
+                SpeedEnabled = false
                 Humanoid.WalkSpeed = 16
-                tpwalking = false
             end)
         end
     end)
@@ -518,14 +513,26 @@ if game.PlaceId == 155615604 then
 
     PlayerController:NewButton("Punch", "Punch Player you want!", function()
         if PlayerControll ~= nil then
-            
-            LoopTeleportAllowed = true
-            local args = {
-                [1] = PlayerControll
-            }
-
-            game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
-            LoopTeleportAllowed = false
+            if PlayerControll ~= nil then
+                if (0 - (PlayerControll.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude)) < 20 then
+                    local args = {
+                        [1] = PlayerControll
+                    }
+    
+                    game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                else
+                    local PunchOldPos = HumanoidRootPart.CFrame
+                    HumanoidRootPart.CFrame = PlayerControll.Character:FindFirstChild("HumanoidRootPart").CFrame or PlayerControll.Character:FindFirstChild("Torso").CFrame
+                    task.wait(.1)
+                    local args = {
+                        [1] = PlayerControll
+                    }
+    
+                    game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                    task.wait(.1)
+                    HumanoidRootPart.CFrame = PunchOldPos
+                end
+            end
         end
     end)
 
@@ -830,18 +837,18 @@ if game.PlaceId == 155615604 then
         if state == true then
             task.spawn(function()
                 CrashServerMode = true
-    game:GetService("RunService").Heartbeat:Connect(function()
-        if CrashServerMode == true then
-            local args = {
-                [1] = PacketCrashTable,
-                [2] = GunCrashModule
-            }
-            
-            game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
-        else
-            CrashServerMode = false
-        end
-    end)
+                game:GetService("RunService").Heartbeat:Connect(function()
+                    if CrashServerMode == true then
+                        local args = {
+                            [1] = PacketCrashTable,
+                            [2] = GunCrashModule
+                        }
+                        
+                        game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
+                    else
+                        CrashServerMode = false
+                    end
+                end)
             end)
         else
             task.spawn(function()
@@ -880,7 +887,7 @@ if game.PlaceId == 155615604 then
                     },
                 }
                 table.insert(PacketCrashTable, PacketTemplate)
-                if PacketCount == MaxCrashPacket then
+                if PacketCount >= MaxCrashPacket then
                     break
                 end
             until PacketCount == MaxCrashPacket
@@ -932,17 +939,36 @@ if game.PlaceId == 155615604 then
         if state then
             task.spawn(function()
                 GodModeEnabled = true
+                repeat task.wait(.1)
+                    Humanoid:Destroy()
+                    task.wait(.1)
+                    Instance.new("Humanoid", char)
+                    game:GetService("Workspace").CurrentCamera.CameraSubject = char
+                    char.Animate.Disabled = true
+                    task.wait(tonumber(game:GetService("Players").RespawnTime))
+                    local savedCFrame = HumanoidRootPart.CFrame
+                    savedCFrame = HumanoidRootPart.CFrame
+                    local Event = game:GetService("Workspace").Remote.loadchar
+                    Event:InvokeServer(plr.Name)
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = savedCFrame
+                    if GodModeEnabled == false then
+                        break
+                    end
+                until GodModeEnabled == false
             end)
         else
-            GodModeEnabled = false
-            local oldpos = HumanoidRootPart.CFrame
-            local args = {
-                [1] = plr.Name
-            }
-            
-            workspace.Remote.loadchar:InvokeServer(unpack(args))
-            task.wait(.1)
-            HumanoidRootPart.CFrame = oldpos
+            task.spawn(function()
+                GodModeEnabled = false
+                local oldpos = HumanoidRootPart.CFrame
+                task.wait(.1)
+                local args = {
+                    [1] = plr.Name
+                }
+                
+                workspace.Remote.loadchar:InvokeServer(unpack(args))
+                task.wait(.1)
+                HumanoidRootPart.CFrame = oldpos
+            end)
         end
     end)
 
@@ -974,25 +1000,6 @@ if game.PlaceId == 155615604 then
                     end
                 end
             end)
-        end
-
-        if GodModeEnabled == true then
-            Humanoid:Destroy()
-            local HumanoidCloneGod = Humanoid:Clone()
-            HumanoidCloneGod.Parent = char
-            HumanoidCloneGod.Name = "Humanoid"
-            task.wait(0.1)
-            game.Workspace.CurrentCamera.CameraSubject = char
-            char.Animate.Disabled = true
-            Humanoid.DisplayDistanceType = "None"
-            task.wait(tonumber(game:GetService("Players").RespawnTime))
-            local saved = HumanoidRootPart.CFrame
-            local args = {
-                [1] = plr.Name
-            }
-            
-            workspace.Remote.loadchar:InvokeServer(unpack(args))
-            HumanoidRootPart.CFrame = saved
         end
 
         if KillAuraToggle == true then
