@@ -975,22 +975,22 @@ if game.PlaceId == 155615604 then
             elseif GiveToolChoosen == "Hammer" then
                 GetItem(workspace.Prison_ITEMS.single:FindFirstChild("Hammer").ITEMPICKUP)
             elseif GiveToolChoosen == "Taser" then
-                local args = {
+                local guardthing = {
                     [1] = "Bright blue"
                 }
                 
-                workspace.Remote.TeamEvent:FireServer(unpack(args))
+                workspace.Remote.TeamEvent:FireServer(unpack(guardthing))
                 local loadchargetrun = {
                     [1] = plr.Name
                 }
         
                 workspace.Remote.loadchar:InvokeServer(unpack(loadchargetrun))
-            elseif GiveToolChoosen == "Handcuff" then
-                local args = {
+            elseif GiveToolChoosen == "Handcuffs" then
+                local guardthing = {
                     [1] = "Bright blue"
                 }
                 
-                workspace.Remote.TeamEvent:FireServer(unpack(args))
+                workspace.Remote.TeamEvent:FireServer(unpack(guardthing))
                 local loadchargetrun = {
                     [1] = plr.Name
                 }
