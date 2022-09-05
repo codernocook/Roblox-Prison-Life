@@ -1,3 +1,4 @@
+local UserInputService = game:GetService("UserInputService")
 if game.PlaceId == 155615604 then
 
     if shared.PrisonLifeItzporium then
@@ -30,6 +31,7 @@ if game.PlaceId == 155615604 then
     local GunCrashModule = nil
     local GunCrashChoose = "Remington 870"
     local Heartbeat = game:GetService("RunService").Heartbeat
+    local Mouse = plr:GetMouse()
     local PlayerInGame = {}
     local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
     --------------
@@ -201,6 +203,35 @@ if game.PlaceId == 155615604 then
 
     --BlatantTab--
         local GiveItem = BlatantTab:NewSection("Give Item")
+        local GiveItemChoosen = nil
+
+        GiveItem:NewDropdown("Item", "Choose Item you want to get", {"Remington 870", "M9", "AK-47", "Crude Knife", "Hammer"}, function(toolselect)
+            task.spawn(function()
+                GiveItemChoosen = tostring(toolselect)
+            end)
+        end)
+
+        GiveItem:NewButton("Get Item", "Get Item you want", function()
+            local function GetItem(Location)
+                local gunpickup = {
+                    [1] = Location
+                }
+        
+                workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
+           end
+            
+            if GiveItemChoosen == "Remington 870" then
+                GetItem(workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP)
+            elseif GiveItemChoosen == "M9" then
+                GetItem(workspace.Prison_ITEMS.giver:FindFirstChild("M9").ITEMPICKUP)
+            elseif GiveItemChoosen == "AK-47" then
+                GetItem(workspace.Prison_ITEMS.giver:FindFirstChild("AK-47").ITEMPICKUP)
+            elseif GiveItemChoosen  == "Crude Knife" then
+                GetItem(workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP)
+            elseif GiveItemChoosen == "Hammer" then
+                GetItem(workspace.Prison_ITEMS.single:FindFirstChild("Hammer").ITEMPICKUP)
+            end
+        end)
         
         GiveItem:NewButton("Give All Item", "Get all of Item in Prison Life i don't think it will work", function()
             task.spawn(function()
@@ -232,6 +263,56 @@ if game.PlaceId == 155615604 then
             else
                 task.spawn(function()
                     KillAuraToggle = state
+                end)
+            end
+        end)
+
+        local DeadPunch = BlatantTab:NewSection("DeadPunch")
+        local DeadPunchEnabled = false
+
+        DeadPunch:NewToggle("Toggle", "its like superpunch", function(state)
+            local PunchPart
+            if state then
+                task.spawn(function()
+                    DeadPunchEnabled = true
+                    local Root = HumanoidRootPart or char:FindFirstChild("Torso")
+                    if HumanoidRootPart or char.Character:FindFirstChild("Torso") then
+                        PunchPart = Instance.new("Part", Root)
+                        PunchPart.Name = "PunchPart"
+                        PunchPart.Size = Vector3.new(3.5, 5, 3.5)
+                        PunchPart.CanCollide = false
+                        PunchPart.Anchored = true
+                        PunchPart.Transparency = 1
+                    end
+                    UserInputService.InputBegan:Connect(function(key)
+                        PunchPart.Touched:Connect(function(hit)
+                            if key.KeyCode == Enum.KeyCode.F and DeadPunchEnabled == true then
+                                local plrhit = game:GetService("Players"):GetPlayerFromCharacter(hit.Parent)
+                                if DeadPunchEnabled == true and Root and not plrhit == plr then
+                                    for Punchloop = 1, 15 do
+                                        local args = {
+                                            [1] = plrhit
+                                        }
+                        
+                                        game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                                    end
+                                end
+                            end
+                        end)
+                    end)
+                    repeat task.wait(.01)
+                        PunchPart.CFrame = HumanoidRootPart.CFrame
+                        if DeadPunchEnabled == false then
+                            break
+                        end
+                    until DeadPunchEnabled == false
+                end)
+            elseif state == false or Humanoid.Health <= 0 then
+                task.spawn(function()
+                    if PunchPart ~= nil and PunchPart.ClassName == "Part" then
+                        DeadPunchEnabled = false
+                        PunchPart:Destroy()
+                    end
                 end)
             end
         end)
@@ -514,7 +595,7 @@ if game.PlaceId == 155615604 then
     PlayerController:NewButton("Punch", "Punch Player you want!", function()
         if PlayerControll ~= nil then
             if PlayerControll ~= nil then
-                if (0 - (PlayerControll.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude)) < 20 then
+                if (PlayerControll.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 20 then
                     local args = {
                         [1] = PlayerControll
                     }
@@ -746,11 +827,11 @@ if game.PlaceId == 155615604 then
         end
     end)
 
-    local GiveGunChoosen = nil
+    local GiveToolChoosen = nil
 
     PlayerController:NewDropdown("Tool", "Choose tool you want to give", {"Remington 870", "M9", "AK-47", "Crude Knife", "Hammer"}, function(toolselect)
         task.spawn(function()
-            GiveGunChoosen = toolselect
+            GiveToolChoosen = tostring(toolselect)
         end)
     end)
 
@@ -772,15 +853,15 @@ if game.PlaceId == 155615604 then
                 workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
            end
             
-            if GiveGunChoosen == "Remington 870" then
+            if GiveToolChoosen == "Remington 870" then
                 GetItem(workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP)
-            elseif GiveGunChoosen == "M9" then
+            elseif GiveToolChoosen == "M9" then
                 GetItem(workspace.Prison_ITEMS.giver:FindFirstChild("M9").ITEMPICKUP)
-            elseif GiveGunChoosen == "AK-47" then
+            elseif GiveToolChoosen == "AK-47" then
                 GetItem(workspace.Prison_ITEMS.giver:FindFirstChild("AK-47").ITEMPICKUP)
-            elseif GiveGunChoosen  == "Crude Knife" then
+            elseif GiveToolChoosen  == "Crude Knife" then
                 GetItem(workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP)
-            elseif GiveGunChoosen == "Hammer" then
+            elseif GiveToolChoosen == "Hammer" then
                 GetItem(workspace.Prison_ITEMS.single:FindFirstChild("Hammer").ITEMPICKUP)
             end
 
@@ -789,9 +870,9 @@ if game.PlaceId == 155615604 then
             char:FindFirstChildWhichIsA("Humanoid"):Destroy()
             Instance.new("Humanoid", char)
     
-            if plr.Backpack:FindFirstChild(GiveGunChoosen) then
-                plr.Backpack:WaitForChild(GiveGunChoosen).Parent = char
-            elseif char:FindFirstChild(GiveGunChoosen) then
+            if plr.Backpack:FindFirstChild(GiveToolChoosen) then
+                plr.Backpack:WaitForChild(GiveToolChoosen).Parent = char
+            elseif char:FindFirstChild(GiveToolChoosen) then
                 task.wait()
             elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
                 local args = {
@@ -890,7 +971,7 @@ if game.PlaceId == 155615604 then
                 if PacketCount >= MaxCrashPacket then
                     break
                 end
-            until PacketCount == MaxCrashPacket
+            until PacketCount >= MaxCrashPacket
        end)
     end)
 
@@ -941,16 +1022,15 @@ if game.PlaceId == 155615604 then
                 GodModeEnabled = true
                 repeat task.wait(.1)
                     Humanoid:Destroy()
-                    task.wait(.1)
                     Instance.new("Humanoid", char)
-                    game:GetService("Workspace").CurrentCamera.CameraSubject = char
                     char.Animate.Disabled = true
+                    game:GetService("Workspace").CurrentCamera.CameraSubject = char
                     task.wait(tonumber(game:GetService("Players").RespawnTime))
                     local savedCFrame = HumanoidRootPart.CFrame
                     savedCFrame = HumanoidRootPart.CFrame
-                    local Event = game:GetService("Workspace").Remote.loadchar
-                    Event:InvokeServer(plr.Name)
-                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = savedCFrame
+                    game:GetService("Workspace").Remote.loadchar:InvokeServer(plr.Name)
+                    HumanoidRootPart.CFrame = savedCFrame
+                    savedCFrame = HumanoidRootPart.CFrame
                     if GodModeEnabled == false then
                         break
                     end
