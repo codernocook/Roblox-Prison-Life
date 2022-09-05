@@ -379,7 +379,7 @@ if game.PlaceId == 155615604 then
         if state then
             task.spawn(function()
                 if Gunmodule ~= nil then
-                    Gunmodule["MaxAmmo"] = math.huge
+                    Gunmodule["MaxAmmo"] = 9999
                     Gunmodule["CurrentAmmo"] = math.huge
                     Gunmodule["FireRate"] = 0.000001
                     Gunmodule["Spread"] = math.huge
@@ -398,6 +398,33 @@ if game.PlaceId == 155615604 then
                 Gunmodule = require(char:WaitForChild(toolselect):WaitForChild("GunStates"))
             end
         end)
+    end)
+
+    local InfAmmoEnabled = false
+
+    GunMod:NewToggle("InfAmmo!", "Make your gun Ammo Infinity!", function(state)
+        if state then
+            task.spawn(function()
+                InfAmmoEnabled = true
+            end)
+        else
+            task.spawn(function()
+                InfAmmoEnabled = false
+            end)
+        end
+    end)
+
+    local LessFireRateEnabled = false
+    GunMod:NewToggle("LessFireRate!", "Make your gun shoot faster!", function(state)
+        if state then
+            task.spawn(function()
+                LessFireRateEnabled = true
+            end)
+        else
+            task.spawn(function()
+                LessFireRateEnabled = false
+            end)
+        end
     end)
 
     GunMod:NewToggle("Mod with your custom settings!", "Make your gun OP like you want!", function(state)
@@ -779,28 +806,28 @@ if game.PlaceId == 155615604 then
 
         local oldposbeforebring = char:WaitForChild("HumanoidRootPart").CFrame
 
-        local gunpickup = {
-            [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+        local Knifepickup = {
+            [1] = workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP
         }
 
-        workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
+        workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
 
         task.wait(.1)
 
         char:FindFirstChildWhichIsA("Humanoid"):Destroy()
         Instance.new("Humanoid", char)
 
-        if plr.Backpack:FindFirstChild("Remington 870") then
-            plr.Backpack:WaitForChild("Remington 870").Parent = char
-        elseif char:FindFirstChild("Remington 870") then
+        if plr.Backpack:FindFirstChild("Crude Knife") then
+            plr.Backpack:WaitForChild("Crude Knife").Parent = char
+        elseif char:FindFirstChild("Crude Knife") then
             task.wait()
         elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-            local args = {
-                [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+            local Knifepickup = {
+                [1] = workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP
             }
-
-            workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-            plr.Backpack:WaitForChild("Remington 870").Parent = char
+    
+            workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
+            plr.Backpack:WaitForChild("Crude Knife").Parent = char
         end
         LoopTeleportBring = true
         task.wait(.5)
@@ -825,28 +852,28 @@ if game.PlaceId == 155615604 then
 
         local oldposbeforebring = char:WaitForChild("HumanoidRootPart").CFrame
 
-        local gunpickup = {
-            [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+        local Knifepickup = {
+            [1] = workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP
         }
 
-        workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
+        workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
 
         task.wait(.1)
 
         char:FindFirstChildWhichIsA("Humanoid"):Destroy()
         Instance.new("Humanoid", char)
 
-        if plr.Backpack:FindFirstChild("Remington 870") then
-            plr.Backpack:WaitForChild("Remington 870").Parent = char
-        elseif char:FindFirstChild("Remington 870") then
+        if plr.Backpack:FindFirstChild("Crude Knife") then
+            plr.Backpack:WaitForChild("Crude Knife").Parent = char
+        elseif char:FindFirstChild("Crude Knife") then
             task.wait()
-        elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
+        elseif not plr.Backpack:FindFirstChild("Crude Knife") or char:FindFirstChild("Crude Knife") then
             local args = {
-                [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+                [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Crude Knife").ITEMPICKUP
             }
 
             workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-            plr.Backpack:WaitForChild("Remington 870").Parent = char
+            plr.Backpack:WaitForChild("Crude Knife").Parent = char
         end
         LoopTeleportBring = true
         task.wait(.5)
@@ -1132,7 +1159,6 @@ if game.PlaceId == 155615604 then
                     char.Animate.Disabled = true
                     game:GetService("Workspace").CurrentCamera.CameraSubject = char
                     task.wait(tonumber(game:GetService("Players").RespawnTime))
-                    local savedCFrame = HumanoidRootPart.CFrame
                     savedCFrame = HumanoidRootPart.CFrame
                     game:GetService("Workspace").Remote.loadchar:InvokeServer(plr.Name)
                     HumanoidRootPart.CFrame = savedCFrame
@@ -1207,6 +1233,19 @@ if game.PlaceId == 155615604 then
                     end
                  end
             end)
+        end
+
+        if InfAmmoEnabled == true then
+            if Gunmodule ~= nil then
+                Gunmodule["MaxAmmo"] = 10000
+                Gunmodule["CurrentAmmo"] = 10000
+            end
+        end
+
+        if LessFireRateEnabled == true then
+            if Gunmodule ~= nil then
+                Gunmodule["FireRate"] = 0.1
+            end
         end
 
         if KillPunch == true then
