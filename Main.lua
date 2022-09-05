@@ -950,7 +950,7 @@ if game.PlaceId == 155615604 then
                 }
         
                 workspace.Remote.loadchar:InvokeServer(unpack(loadchargetrun))
-            elseif GiveToolChoosen == "Hancuff" then
+            elseif GiveToolChoosen == "Handcuff" then
                 local args = {
                     [1] = "Bright blue"
                 }
