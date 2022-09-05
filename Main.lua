@@ -114,6 +114,14 @@ if game.PlaceId == 155615604 then
         end)
     end)
 
+    local BugsFix = PlayerTab:NewSection("BugsFix")
+
+    BugsFix:NewButton("FixBackpack", "Fix backpack not appear", function()
+        task.spawn(function()
+            game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.Backpack)
+        end)
+    end)
+
     local Character = PlayerTab:NewSection("Character")
     Character:NewButton("LoadCharacter", "Make your character respawn server side type", function()
         task.spawn(function()
