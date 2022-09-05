@@ -118,7 +118,7 @@ if game.PlaceId == 155615604 then
 
     BugsFix:NewButton("FixBackpack", "Fix backpack not appear", function()
         task.spawn(function()
-            game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.Backpack)
+            game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, true)
         end)
     end)
 
