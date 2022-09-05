@@ -753,6 +753,7 @@ if game.PlaceId == 155615604 then
                         }
                         
                         workspace.Remote.loadchar:InvokeServer(unpack(FreezeLoadChar1))
+                        task.wait(.1)
                         HumanoidRootPart.CFrame = oldcharbeforefreeze
                     end
             end
@@ -904,7 +905,7 @@ if game.PlaceId == 155615604 then
 
     local GiveToolChoosen = nil
 
-    PlayerController:NewDropdown("Tool", "Choose tool you want to give", {"Remington 870", "M9", "AK-47", "Crude Knife", "Hammer"}, function(toolselect)
+    PlayerController:NewDropdown("Tool", "Choose tool you want to give", {"Remington 870", "M9", "AK-47", "Crude Knife", "Hammer", "Taser", "Handcuffs"}, function(toolselect)
         task.spawn(function()
             GiveToolChoosen = tostring(toolselect)
         end)
@@ -938,6 +939,28 @@ if game.PlaceId == 155615604 then
                 GetItem(workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP)
             elseif GiveToolChoosen == "Hammer" then
                 GetItem(workspace.Prison_ITEMS.single:FindFirstChild("Hammer").ITEMPICKUP)
+            elseif GiveToolChoosen == "Taser" then
+                local args = {
+                    [1] = "Bright blue"
+                }
+                
+                workspace.Remote.TeamEvent:FireServer(unpack(args))
+                local loadchargetrun = {
+                    [1] = plr.Name
+                }
+        
+                workspace.Remote.loadchar:InvokeServer(unpack(loadchargetrun))
+            elseif GiveToolChoosen == "Hancuff" then
+                local args = {
+                    [1] = "Bright blue"
+                }
+                
+                workspace.Remote.TeamEvent:FireServer(unpack(args))
+                local loadchargetrun = {
+                    [1] = plr.Name
+                }
+        
+                workspace.Remote.loadchar:InvokeServer(unpack(loadchargetrun))
             end
 
             task.wait(.1)
