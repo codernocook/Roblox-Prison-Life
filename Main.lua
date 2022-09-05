@@ -2,7 +2,7 @@ if game.PlaceId == 155615604 then
 
     if shared.PrisonLifeItzporium then
         return
-        warn("PrisonLife script is running!")
+        error("PrisonLife script is running!")
     else
         shared.PrisonLifeItzporium = true
     end
@@ -22,7 +22,7 @@ if game.PlaceId == 155615604 then
     local plr = game:GetService("Players").LocalPlayer
     local char = plr.Character or plr.CharacterAdded
     local Humanoid = char:FindFirstChildWhichIsA("Humanoid")
-    local HumanoidRootPart = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso")
+    local HumanoidRootPart = char:FindFirstChild("HumanoidRootPart")
     local SpeedNumber = 16
     local Damage = 20
     local GunChoose = "Remington 870"
@@ -44,30 +44,12 @@ if game.PlaceId == 155615604 then
                 queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/codernocook/prisonlife/main/Main.lua'))()")
             end
         end
-    end)
+    end)    
 
-    local function randomString()
-        local length = math.random(10,20)
-        local array = {}
-        for i = 1, length do
-            array[i] = string.char(math.random(32, 126))
-        end
-        return table.concat(array)
-    end
-
-    local function CreateNotification(text)
-        game:GetService("StarterGui"):SetCore("ChatMakeSystemMessage",{
-            Text = text,
-            Font = Enum.Font.SourceSansBold,
-            TextSize = 20,
-            Color = Color3.new(255, 255, 255)
-        })
-    end
     --PlayerTab
     local Fly = PlayerTab:NewSection("Fly")
     Fly:NewToggle("Toggle", "Make you character Fly.", function(state)
         if state then
-          task.spawn(function()
             local uis = game:GetService("UserInputService")
             local floatName = "Flydude"
             local Tpwalkspeed = 50
@@ -77,9 +59,9 @@ if game.PlaceId == 155615604 then
             Float.Size = Vector3.new(2,0.2,1.5)
             Float.Anchored = true
             local FloatValue = -3.1
-            Float.CFrame = HumanoidRootPart.CFrame * CFrame.new(0, FloatValue, 0)
+            Float.CFrame = char:WaitForChild("HumanoidRootPart").CFrame * CFrame.new(0, FloatValue, 0)
             game:GetService("RunService").Heartbeat:Connect(function()
-                Float.CFrame = HumanoidRootPart.CFrame * CFrame.new(0, FloatValue, 0)
+                Float.CFrame = char:WaitForChild("HumanoidRootPart").CFrame * CFrame.new(0, FloatValue, 0)
             end)
                 task.spawn(function()
                         uis.InputBegan:Connect(function(key)
@@ -98,13 +80,10 @@ if game.PlaceId == 155615604 then
                             end
                         end)
                 end)
-          end)
             else
-                task.spawn(function()
-                    if char:FindFirstChild("Flydude") then
-                        char:FindFirstChild("Flydude"):Destroy()
-                    end
-                end)
+                if char:FindFirstChild("Flydude") then
+                    char:WaitForChild("Flydude"):Destroy()
+                end
         end
     end)
     --
@@ -112,11 +91,23 @@ if game.PlaceId == 155615604 then
     Speed:NewToggle("Toggle", "Improve your movement.", function(state)
         if state then
             task.spawn(function()
-                Humanoid.WalkSpeed = state
+                tpwalking = true
+                local chr = char
+	            local hum = chr and Humanoid
+	                while tpwalking and Heartbeat:Wait() and chr and hum and hum.Parent do
+		                 if hum.MoveDirection.Magnitude > 0 then
+			                if hum.MoveDirection.Magnitude > 0 then
+                                chr:TranslateBy(hum.MoveDirection * tonumber(SpeedNumber / 200))
+                            else
+                                chr:TranslateBy(hum.MoveDirection)
+                            end
+		                end
+	                end
             end)
         else
             task.spawn(function()
                 Humanoid.WalkSpeed = 16
+                tpwalking = false
             end)
         end
     end)
@@ -199,7 +190,7 @@ if game.PlaceId == 155615604 then
 
     Team:NewButton("Black Team", "Turn you into black team so everyone thing you are hacker lol", function()
         task.spawn(function()
-            local oldpos = HumanoidRootPart.CFrame
+            local oldpos = char:WaitForChild("HumanoidRootPart").CFrame
             task.wait(.1)
             local args = {
                 [1] = plr,
@@ -208,7 +199,7 @@ if game.PlaceId == 155615604 then
 
             workspace.Remote.loadchar:InvokeServer(unpack(args))
             task.wait(.1)
-            HumanoidRootPart.CFrame = oldpos
+            char:WaitForChild("HumanoidRootPart").CFrame = oldpos
         end)
     end)
     ----------
@@ -515,9 +506,7 @@ if game.PlaceId == 155615604 then
             game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
             game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
             PlayerControll.Character:FindFirstChildWhichIsA("Humanoid").StateChanged:Connect(function(oldstate, newstate)
-                if newstate == Enum.HumanoidStateType.Dead then
-                   task.wait()
-                else
+                if newstate ~= Enum.HumanoidStateType.Dead then
                     KillPunch = true
                     task.wait(.5)
                     KillPunch = false
@@ -528,264 +517,17 @@ if game.PlaceId == 155615604 then
     end)
 
     PlayerController:NewButton("Punch", "Punch Player you want!", function()
-        task.spawn(function()
-            if PlayerControll ~= nil then
-                if (0 - (PlayerControll.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude)) < 20 then
-                    local args = {
-                        [1] = PlayerControll
-                    }
-    
-                    game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
-                else
-                    local PunchOldPos = HumanoidRootPart.CFrame
-                    HumanoidRootPart.CFrame = PlayerControll.Character:FindFirstChild("HumanoidRootPart").CFrame or PlayerControll.Character:FindFirstChild("Torso").CFrame
-                    task.wait(.1)
-                    local args = {
-                        [1] = PlayerControll
-                    }
-    
-                    game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
-                    task.wait(.1)
-                    HumanoidRootPart.CFrame = PunchOldPos
-                end
-            end
-        end)
+        if PlayerControll ~= nil then
+            
+            LoopTeleportAllowed = true
+            local args = {
+                [1] = PlayerControll
+            }
+
+            game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+            LoopTeleportAllowed = false
+        end
     end)
-
-    PlayerController:NewButton("Fling", "Fling Player you want!", function()
-        task.spawn(function()
-            if PlayerControll ~= nil then
-                -- Credit to mgamingpro the owner of Homebrew
-                local plrfling = PlayerControll
-                local AllBool = false
-                local TargetPlayer = plrfling
-                local OldPos
-
-                local function flingem(TargetPlayer)
-                    local Character = char
-                    local Humanoid = char and Humanoid
-                    local RootPart = char and HumanoidRootPart
-
-                    local TCharacter = TargetPlayer.Character
-                    local THumanoid
-                    local TRootPart
-                    local THead
-                    local Accessory
-                    local Handle
-                    local Accessoy
-
-                    if TCharacter:FindFirstChildOfClass("Humanoid") then
-                        THumanoid = TCharacter:FindFirstChildOfClass("Humanoid")
-                    end
-                    if THumanoid and THumanoid.RootPart then
-                        TRootPart = THumanoid.RootPart
-                    end
-                    if TCharacter:FindFirstChild("Head") then
-                        THead = TCharacter.Head
-                    end
-                    if TCharacter:FindFirstChildOfClass("Accessory") then
-                        Accessory = TCharacter:FindFirstChildOfClass("Accessory")
-                    end
-                    if Accessoy and Accessory:FindFirstChild("Handle") then
-                        Handle = Accessory.Handle
-                    end
-
-                    if Character and Humanoid and RootPart then
-                        --workspace.FallenPartsDestroyHeight =
-                        if RootPart.Velocity.Magnitude < 50 then
-                            OldPos = HumanoidRootPart.CFrame
-                        end
-                        if THumanoid and THumanoid.Sit and not AllBool then
-                            CreateNotification("Can't fling Player Selected!") -- u can remove dis part if u want lol
-                        end
-                        if THead then
-                            workspace.CurrentCamera.CameraSubject = THead
-                        elseif not THead and Handle then
-                            workspace.CurrentCamera.CameraSubject = Handle
-                        elseif THumanoid and TRootPart then
-                            workspace.CurrentCamera.CameraSubject = THumanoid
-                        end
-                        if not TCharacter:FindFirstChildWhichIsA("BasePart") then
-                            return
-                        end
-
-                        local FPos = function(BasePart, Pos, Ang)
-                            RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
-                            Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
-                            RootPart.Velocity = Vector3.new(9e7, 9e7 * 10, 9e7)
-                            RootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
-                        end
-
-                        local SFBasePart = function(BasePart)
-                            local TimeToWait = 2
-                            local Time = tick()
-                            local Angle = 0
-
-                            repeat
-                                if RootPart and THumanoid then
-                                    if BasePart.Velocity.Magnitude < 50 then
-                                        Angle = Angle + 100
-
-                                        FPos(
-                                            BasePart,
-                                            CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25,
-                                            CFrame.Angles(math.rad(Angle), 0, 0)
-                                        )
-                                        task.wait()
-
-                                        FPos(
-                                            BasePart,
-                                            CFrame.new(0, -1.5, 0) +
-                                                THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25,
-                                            CFrame.Angles(math.rad(Angle), 0, 0)
-                                        )
-                                        task.wait()
-
-                                        FPos(
-                                            BasePart,
-                                            CFrame.new(2.25, 1.5, -2.25) +
-                                                THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25,
-                                            CFrame.Angles(math.rad(Angle), 0, 0)
-                                        )
-                                        task.wait()
-
-                                        FPos(
-                                            BasePart,
-                                            CFrame.new(-2.25, -1.5, 2.25) +
-                                                THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25,
-                                            CFrame.Angles(math.rad(Angle), 0, 0)
-                                        )
-                                        task.wait()
-
-                                        FPos(
-                                            BasePart,
-                                            CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection,
-                                            CFrame.Angles(math.rad(Angle), 0, 0)
-                                        )
-                                        task.wait()
-
-                                        FPos(
-                                            BasePart,
-                                            CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection,
-                                            CFrame.Angles(math.rad(Angle), 0, 0)
-                                        )
-                                        task.wait()
-                                    else
-                                        FPos(
-                                            BasePart,
-                                            CFrame.new(0, 1.5, THumanoid.WalkSpeed),
-                                            CFrame.Angles(math.rad(90), 0, 0)
-                                        )
-                                        task.wait()
-
-                                        FPos(BasePart, CFrame.new(0, -1.5, -THumanoid.WalkSpeed), CFrame.Angles(0, 0, 0))
-                                        task.wait()
-
-                                        FPos(
-                                            BasePart,
-                                            CFrame.new(0, 1.5, THumanoid.WalkSpeed),
-                                            CFrame.Angles(math.rad(90), 0, 0)
-                                        )
-                                        task.wait()
-
-                                        FPos(
-                                            BasePart,
-                                            CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25),
-                                            CFrame.Angles(math.rad(90), 0, 0)
-                                        )
-                                        task.wait()
-
-                                        FPos(
-                                            BasePart,
-                                            CFrame.new(0, -1.5, -TRootPart.Velocity.Magnitude / 1.25),
-                                            CFrame.Angles(0, 0, 0)
-                                        )
-                                        task.wait()
-
-                                        FPos(
-                                            BasePart,
-                                            CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25),
-                                            CFrame.Angles(math.rad(90), 0, 0)
-                                        )
-                                        task.wait()
-
-                                        FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(math.rad(90), 0, 0))
-                                        task.wait()
-
-                                        FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
-                                        task.wait()
-
-                                        FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(math.rad(-90), 0, 0))
-                                        task.wait()
-
-                                        FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
-                                        task.wait()
-                                    end
-                                else
-                                    break
-                                end
-                            until BasePart.Velocity.Magnitude > 500 or BasePart.Parent ~= TargetPlayer.Character or
-                                TargetPlayer.Parent ~= game:GetService("Players") or
-                                not TargetPlayer.Character == TCharacter or
-                                THumanoid.Sit or
-                                Humanoid.Health <= 0 or
-                                tick() > Time + TimeToWait
-                        end
-
-                        workspace.FallenPartsDestroyHeight = 0 / 0
-
-                        local BV = Instance.new("BodyVelocity")
-                        BV.Name = "EpixVel"
-                        BV.Parent = RootPart
-                        BV.Velocity = Vector3.new(9e8, 9e8, 9e8)
-                        BV.MaxForce = Vector3.new(1 / 0, 1 / 0, 1 / 0)
-
-                        Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
-
-                        if TRootPart and THead then
-                            if (TRootPart.CFrame.p - THead.CFrame.p).Magnitude > 5 then
-                                SFBasePart(THead)
-                            else
-                                SFBasePart(TRootPart)
-                            end
-                        elseif TRootPart and not THead then
-                            SFBasePart(TRootPart)
-                        elseif not TRootPart and THead then
-                            SFBasePart(THead)
-                        elseif not TRootPart and not THead and Accessory and Handle then
-                            SFBasePart(Handle)
-                        else
-                            return CreateNotification("Please select vaild target!")
-                        end
-
-                        BV:Destroy()
-                        Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
-                        workspace.CurrentCamera.CameraSubject = Humanoid
-
-                        repeat
-                            HumanoidRootPart.CFrame = OldPos * CFrame.new(0, 0.5, 0)
-                            Character:SetPrimaryPartCFrame(OldPos * CFrame.new(0, 0.5, 0))
-                            Humanoid:ChangeState("GettingUp")
-                            table.foreach(
-                                Character:GetChildren(),
-                                function(_, x)
-                                    if x:IsA("BasePart") then
-                                        x.Velocity, x.RotVelocity = Vector3.new(), Vector3.new()
-                                    end
-                                end
-                            )
-                            task.wait()
-                        until (RootPart.Position - OldPos.p).Magnitude < 25
-                    else
-                        return CreateNotification("Can't fling player selected maybe script issue bruh")
-                    end
-            end
-
-            flingem(TargetPlayer)
-            end
-        end)
-    end)
-
 
     PlayerController:NewButton("Arrest", "Arrest the player you want!", function()
        task.spawn(function()
@@ -795,7 +537,7 @@ if game.PlaceId == 155615604 then
             OldTeamBeforeArrest = "Bright orange"
 
             if plr.Team == "Guards" then
-                BeforeArrestOldpos = HumanoidRootPart.CFrame
+                BeforeArrestOldpos = char:WaitForChild("HumanoidRootPart").CFrame
                 LoopTeleportAllowed = true
                 local HandleArrest = {
                     [1] = PlayerControll.Character.Head
@@ -809,7 +551,7 @@ if game.PlaceId == 155615604 then
                 
                 workspace.Remote.arrest:InvokeServer(unpack(arrestremote))
                 LoopTeleportAllowed = false
-                HumanoidRootPart.CFrame = BeforeArrestOldpos
+                char:WaitForChild("HumanoidRootPart").CFrame = BeforeArrestOldpos
                 if plr.TeamColor == OldTeamBeforeArrest then
                     task.wait()
                 else
@@ -825,7 +567,7 @@ if game.PlaceId == 155615604 then
                 }
                 
                 workspace.Remote.TeamEvent:FireServer(unpack(args))
-                BeforeArrestOldpos = HumanoidRootPart.CFrame
+                BeforeArrestOldpos = char:WaitForChild("HumanoidRootPart").CFrame
                 LoopTeleportAllowed = true
                 local HandleArrest = {
                     [1] = PlayerControll.Character.Head
@@ -839,7 +581,7 @@ if game.PlaceId == 155615604 then
                 
                 workspace.Remote.arrest:InvokeServer(unpack(arrestremote))
                 LoopTeleportAllowed = false
-                HumanoidRootPart.CFrame = BeforeArrestOldpos
+                char:WaitForChild("HumanoidRootPart").CFrame = BeforeArrestOldpos
                 if plr.TeamColor == OldTeamBeforeArrest then
                     task.wait()
                 else
@@ -857,101 +599,96 @@ if game.PlaceId == 155615604 then
     local LoopTeleportBring = false
 
     PlayerController:NewButton("Bring", "Bring player you want to you!", function()
-        task.spawn(function()
-            local loadcharbefore = {
-                [1] = plr.Name
-            }
-    
-            workspace.Remote.loadchar:InvokeServer(unpack(loadcharbefore))
-    
-            local oldposbeforebring = HumanoidRootPart.CFrame
-    
-            local gunpickup = {
+        local loadcharbefore = {
+            [1] = plr.Name
+        }
+
+        workspace.Remote.loadchar:InvokeServer(unpack(loadcharbefore))
+
+        local oldposbeforebring = char:WaitForChild("HumanoidRootPart").CFrame
+
+        local gunpickup = {
+            [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+        }
+
+        workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
+
+        task.wait(.1)
+
+        char:FindFirstChildWhichIsA("Humanoid"):Destroy()
+        Instance.new("Humanoid", char)
+
+        if plr.Backpack:FindFirstChild("Remington 870") then
+            plr.Backpack:WaitForChild("Remington 870").Parent = char
+        elseif char:FindFirstChild("Remington 870") then
+            task.wait()
+        elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
+            local args = {
                 [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
             }
-    
-            workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
-    
-            task.wait(.1)
-    
-            Humanoid:Destroy()
-            Instance.new("Humanoid", char)
-    
-            if plr.Backpack:FindFirstChild("Remington 870") then
-                plr.Backpack:WaitForChild("Remington 870").Parent = char
-            elseif char:FindFirstChild("Remington 870") then
-                task.wait()
-            elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-                local args = {
-                    [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
-                }
-    
-                workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-                plr.Backpack:WaitForChild("Remington 870").Parent = char
-            end
-            LoopTeleportBring = true
-            task.wait(.5)
-            LoopTeleportBring = false
-            HumanoidRootPart.CFrame = oldposbeforebring
-            task.wait(.5)
-            local loadcharafter = {
-                [1] = plr.Name
-            }
-    
-            workspace.Remote.loadchar:InvokeServer(unpack(loadcharafter))
-            task.wait(.1)
-            HumanoidRootPart.CFrame = oldposbeforebring
-        end)
+
+            workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+            plr.Backpack:WaitForChild("Remington 870").Parent = char
+        end
+        LoopTeleportBring = true
+        task.wait(.5)
+        LoopTeleportBring = false
+        char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
+        task.wait(.5)
+        local loadcharafter = {
+            [1] = plr.Name
+        }
+
+        workspace.Remote.loadchar:InvokeServer(unpack(loadcharafter))
+        task.wait(.1)
+        char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
     end)
 
     PlayerController:NewButton("Trap", "Trap player you want into a building!", function()
-        task.spawn(function()
-            local loadcharbefore = {
-                [1] = plr.Name
-            }
-    
-            workspace.Remote.loadchar:InvokeServer(unpack(loadcharbefore))
-    
-            local oldposbeforebring = HumanoidRootPart.CFrame
-    
-            local gunpickup = {
+        local loadcharbefore = {
+            [1] = plr.Name
+        }
+
+        workspace.Remote.loadchar:InvokeServer(unpack(loadcharbefore))
+
+        local oldposbeforebring = char:WaitForChild("HumanoidRootPart").CFrame
+
+        local gunpickup = {
+            [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+        }
+
+        workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
+
+        task.wait(.1)
+
+        char:FindFirstChildWhichIsA("Humanoid"):Destroy()
+        Instance.new("Humanoid", char)
+
+        if plr.Backpack:FindFirstChild("Remington 870") then
+            plr.Backpack:WaitForChild("Remington 870").Parent = char
+        elseif char:FindFirstChild("Remington 870") then
+            task.wait()
+        elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
+            local args = {
                 [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
             }
-    
-            workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
-    
-            task.wait(.1)
-    
-            Humanoid:Destroy()
-            Instance.new("Humanoid", char)
-    
-            if plr.Backpack:FindFirstChild("Remington 870") then
-                plr.Backpack:WaitForChild("Remington 870").Parent = char
-            elseif char:FindFirstChild("Remington 870") then
-                task.wait()
-            elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-                local args = {
-                    [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
-                }
-    
-                workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-                plr.Backpack:WaitForChild("Remington 870").Parent = char
-            end
-            LoopTeleportBring = true
-            task.wait(.5)
-            LoopTeleportBring = false
-            HumanoidRootPart.CFrame = CFrame.new(-328.772797, 84.2401199, 1953.56274, -0.774003625, 3.31737269e-08, -0.633181155, 4.14672492e-08, 1, 1.70239745e-09, 0.633181155, -2.49386201e-08, -0.774003625)
-            task.wait(.5)
-            local loadcharafter = {
-                [1] = plr.Name
-            }
-    
-            workspace.Remote.loadchar:InvokeServer(unpack(loadcharafter))
-            task.wait(.1)
-            HumanoidRootPart.CFrame = oldposbeforebring
-        end)
-    end)
 
+            workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+            plr.Backpack:WaitForChild("Remington 870").Parent = char
+        end
+        LoopTeleportBring = true
+        task.wait(.5)
+        LoopTeleportBring = false
+        char:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-328.772797, 84.2401199, 1953.56274, -0.774003625, 3.31737269e-08, -0.633181155, 4.14672492e-08, 1, 1.70239745e-09, 0.633181155, -2.49386201e-08, -0.774003625)
+        task.wait(.5)
+        local loadcharafter = {
+            [1] = plr.Name
+        }
+
+        workspace.Remote.loadchar:InvokeServer(unpack(loadcharafter))
+        task.wait(.1)
+        char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
+    end)
     local SpectateConnection = nil
 
     PlayerController:NewToggle("Spectate", "Wiew player cam", function(state)
@@ -985,7 +722,7 @@ if game.PlaceId == 155615604 then
                     Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
                 end
                 task.wait(.1)
-                HumanoidRootPart.CFrame = PlayerControll.Character:FindFirstChild("HumanoidRootPart").CFrame or PlayerControll.Character:FindFirstChild("Torso").CFrame
+                char:WaitForChild("HumanoidRootPart").CFrame = PlayerControll.Character:WaitForChild("HumanoidRootPart").CFrame
             end
         end)
     end)
@@ -1001,6 +738,78 @@ if game.PlaceId == 155615604 then
             end)
         end
     end)
+
+    local GiveGunChoosen = nil
+
+    PlayerController:NewDropdown("Tool", "Choose tool you want to give", {"Remington 870", "M9", "AK-47", "Crude Knife", "Hammer"}, function(toolselect)
+        task.spawn(function()
+            GiveGunChoosen = toolselect
+        end)
+    end)
+
+    PlayerController:NewButton("Give Tool", "Give Tool you want to player", function()
+        task.spawn(function()
+            local loadcharbefore = {
+                [1] = plr.Name
+            }
+    
+            workspace.Remote.loadchar:InvokeServer(unpack(loadcharbefore))
+    
+            local oldposbeforebring = char:WaitForChild("HumanoidRootPart").CFrame
+    
+           local function GetItem(Location)
+                local gunpickup = {
+                    [1] = Location
+                }
+        
+                workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
+           end
+            
+            if GiveGunChoosen == "Remington 870" then
+                GetItem(workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP)
+            elseif GiveGunChoosen == "M9" then
+                GetItem(workspace.Prison_ITEMS.giver:FindFirstChild("M9").ITEMPICKUP)
+            elseif GiveGunChoosen == "AK-47" then
+                GetItem(workspace.Prison_ITEMS.giver:FindFirstChild("AK-47").ITEMPICKUP)
+            elseif GiveGunChoosen  == "Crude Knife" then
+                GetItem(workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP)
+            elseif GiveGunChoosen == "Hammer" then
+                GetItem(workspace.Prison_ITEMS.single:FindFirstChild("Hammer").ITEMPICKUP)
+            end
+
+            task.wait(.1)
+    
+            char:FindFirstChildWhichIsA("Humanoid"):Destroy()
+            Instance.new("Humanoid", char)
+    
+            if plr.Backpack:FindFirstChild(GiveGunChoosen) then
+                plr.Backpack:WaitForChild(GiveGunChoosen).Parent = char
+            elseif char:FindFirstChild(GiveGunChoosen) then
+                task.wait()
+            elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
+                local args = {
+                    [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+                }
+    
+                workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+                plr.Backpack:WaitForChild("Remington 870").Parent = char
+            end
+            LoopTeleportBring = true
+            task.wait(.5)
+            LoopTeleportBring = false
+            task.wait(.5)
+            local loadcharafter = {
+                [1] = plr.Name
+            }
+    
+            workspace.Remote.loadchar:InvokeServer(unpack(loadcharafter))
+            task.wait(.1)
+            char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
+        end)
+    end)
+
+
+
     -------------------
 
     --ExploitTab--
@@ -1117,45 +926,15 @@ if game.PlaceId == 155615604 then
     end)
 
     local GodMode = ExploitTab:NewSection("GodMode")
+    local GodModeEnabled = false
 
     GodMode:NewToggle("GodMode", "Turn you into god!", function(state)
         if state then
             task.spawn(function()
-                local RunService = game:GetService("RunService");
-                local Players = game:GetService("Players");
-                local LocalPlayer = game:GetService("Players").LocalPlayer; 
-                local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait();
-                local Humanoid = Character:WaitForChild("Humanoid") or Character:FindFirstChildOfClass("Humanoid");
-                local HRP = Humanoid.RootPart or Humanoid:FindFirstChild("HumanoidRootPart")
-                
-                -- Check
-                if not Humanoid or not state then
-                if Humanoid and Humanoid.Health <= 0 then
-                    Humanoid:Destroy()
-                end
-                return
-                end
-                
-                -- Setting Up Humanoid
-                Humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
-                Humanoid.BreakJointsOnDeath = false
-                Humanoid.RequiresNeck = false
-                
-                local con; con = RunService.Stepped:Connect(function()
-                if not Humanoid then return con:Disconnect() end
-                Humanoid:ChangeState(Enum.HumanoidStateType.Landed)
-                end)
-                
-                LocalPlayer.Character = nil
-                LocalPlayer.Character = Character
-                task.wait(Players.RespawnTime + 0.1)
-                
-                while task.wait(110) do
-                Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
-                HRP.Died.SoundId = ""
-                end
+                GodModeEnabled = true
             end)
         else
+            GodModeEnabled = false
             local oldpos = HumanoidRootPart.CFrame
             local args = {
                 [1] = plr.Name
@@ -1177,7 +956,7 @@ if game.PlaceId == 155615604 then
                         if Humanoid and Humanoid.Sit == true then
                             Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
                          end
-                        HumanoidRootPart.CFrame = PlayerControll.Character:FindFirstChild("HumanoidRootPart").CFrame
+                        char:WaitForChild("HumanoidRootPart").CFrame = PlayerControll.Character:WaitForChild("HumanoidRootPart").CFrame
                     end
                 end
             end)
@@ -1187,14 +966,33 @@ if game.PlaceId == 155615604 then
             task.spawn(function()
                 if PlayerControll ~= nil then
                     if PlayerControll.Character then
-                        local targetroot = PlayerControll.Character:FindFirstChild("HumanoidRootPart").CFrame
+                        local targetroot = PlayerControll.Character:WaitForChild("HumanoidRootPart").CFrame
                         for i = 1, 5 do
-                            HumanoidRootPart.CFrame = CFrame.new(targetroot.X + 1, targetroot.Y + -1, targetroot.Z - 0.5)
-                            HumanoidRootPart.CFrame = CFrame.new(targetroot.X - 1, targetroot.Y - -1, targetroot.Z + 0.5)
+                            char:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(targetroot.X + 1, targetroot.Y + -1, targetroot.Z - 0.5)
+                            char:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(targetroot.X - 1, targetroot.Y - -1, targetroot.Z + 0.5)
                         end
                     end
                 end
             end)
+        end
+
+        if GodModeEnabled == true then
+            Humanoid:Destroy()
+            local HumanoidCloneGod = Humanoid:Clone()
+            HumanoidCloneGod.Parent = char
+            HumanoidCloneGod.Name = "Humanoid"
+            task.wait(0.1)
+            game.Workspace.CurrentCamera.CameraSubject = char
+            char.Animate.Disabled = true
+            Humanoid.DisplayDistanceType = "None"
+            task.wait(tonumber(game:GetService("Players").RespawnTime))
+            local saved = HumanoidRootPart.CFrame
+            local args = {
+                [1] = plr.Name
+            }
+            
+            workspace.Remote.loadchar:InvokeServer(unpack(args))
+            HumanoidRootPart.CFrame = saved
         end
 
         if KillAuraToggle == true then
@@ -1202,13 +1000,15 @@ if game.PlaceId == 155615604 then
                 for i, v in pairs(game:GetService("Players"):GetPlayers()) do
                     if v ~= plr then
                         if v.Character then
-                            if (0 - (v.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude)) < 20 then
-                                task.wait(.5)
-                                local args = {
-                                    [1] = v
-                                }
-            
-                                game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                            if v.Character:FindFirstChild("HumanoidRootPart") then
+                                if (v.Character:WaitForChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 20 then
+                                    task.wait(.5)
+                                    local args = {
+                                        [1] = v
+                                    }
+                
+                                    game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                                end
                             end
                         end
                     end
@@ -1219,7 +1019,7 @@ if game.PlaceId == 155615604 then
         if KillPunch == true then
             if PlayerControll ~= nil then
                 if PlayerControll.Character:FindFirstChild("HumanoidRootPart") then
-                    if (0 - (PlayerControll.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude)) < 20 then
+                    if (PlayerControll.Character:WaitForChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 50 then
                         local args = {
                             [1] = PlayerControll
                         }
