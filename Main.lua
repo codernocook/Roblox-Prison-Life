@@ -1,4 +1,3 @@
-local UserInputService = game:GetService("UserInputService")
 if game.PlaceId == 155615604 then
 
     if shared.PrisonLifeItzporium then
@@ -9,13 +8,22 @@ if game.PlaceId == 155615604 then
     end
 
     local LibraryUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-    local ScriptWindows =  LibraryUI.CreateLib("Prison Life".."", "Sentinel")
+    local ScriptWindows = {}
+
+    task.spawn(function()
+        if _G.Theme then
+            ScriptWindows = LibraryUI.CreateLib("Prison Life".."", tostring(_G.Theme))
+        else
+            ScriptWindows = LibraryUI.CreateLib("Prison Life".."", "Sentinel")
+        end
+    end)
 
     --Tab--
     local PlayerTab = ScriptWindows:NewTab("Player")
     local BlatantTab = ScriptWindows:NewTab("Blatant")
     local GunTab = ScriptWindows:NewTab("Gun")
-    local ServerModerator = ScriptWindows:NewTab("ServerMod")
+    local ServerModerator = ScriptWindows:NewTab("ServerModerator")
+    local VisualTab = ScriptWindows:NewTab("Visual")
     local ExploitTab = ScriptWindows:NewTab("Exploit")
     -------
 
@@ -34,6 +42,7 @@ if game.PlaceId == 155615604 then
     local Mouse = plr:GetMouse()
     local PlayerInGame = {}
     local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
+    local UserInputService = game:GetService("UserInputService")
     --------------
     
 
@@ -1028,10 +1037,22 @@ if game.PlaceId == 155615604 then
             char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
         end)
     end)
-
-
-
     -------------------
+
+    --VisualTab--
+    local Theme = VisualTab:NewSection("Theme")
+    local ThemeChoose = ""
+
+    Theme:NewDropdown("Theme", "Choose theme you like", {"LightTheme", "DarkTheme", "GrapeTheme", "BloodTheme", "Ocean", "Midnight", "Sentinel", "Synapse"}, function(themechoose)
+        task.spawn(function()
+            ThemeChoose = tostring(themechoose)
+        end)
+    end)
+    PlayerController:NewButton("Change Theme", "Change The Theme", function()
+        _G.Theme = tostring(ThemeChoose)
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/codernocook/prisonlife/main/Main.lua"))()
+    end)
+    -------------
 
     --ExploitTab--
     local CrashServer = ExploitTab:NewSection("ServerCrasher")
