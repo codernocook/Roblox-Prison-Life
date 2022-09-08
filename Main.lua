@@ -22,7 +22,7 @@ if game.PlaceId == 155615604 then
     local PlayerTab = ScriptWindows:NewTab("Player")
     local BlatantTab = ScriptWindows:NewTab("Blatant")
     local GunTab = ScriptWindows:NewTab("Gun")
-    local ServerModerator = ScriptWindows:NewTab("ServerModerator")
+    local ServerModerator = ScriptWindows:NewTab("ServerMod")
     local VisualTab = ScriptWindows:NewTab("Visual")
     local ExploitTab = ScriptWindows:NewTab("Exploit")
     -------
@@ -1048,7 +1048,8 @@ if game.PlaceId == 155615604 then
             ThemeChoose = tostring(themechoose)
         end)
     end)
-    PlayerController:NewButton("Change Theme", "Change The Theme", function()
+    
+    Theme:NewButton("Change Theme", "Change The Theme", function()
         _G.Theme = tostring(ThemeChoose)
         loadstring(game:HttpGet("https://raw.githubusercontent.com/codernocook/prisonlife/main/Main.lua"))()
     end)
