@@ -45,7 +45,7 @@ if game.PlaceId == 155615604 then
                 queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/codernocook/prisonlife/main/Main.lua'))()")
             end
         end
-    end)    
+    end)
 
     --PlayerTab
     local Fly = PlayerTab:NewSection("Fly")
@@ -674,6 +674,15 @@ if game.PlaceId == 155615604 then
 
     PlayerController:NewToggle("LoopKill", "Loop kill the player you want!", function(state)
         if state then
+            if plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
+                task.wait()
+            else     
+                local args = {
+                    [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+                }
+    
+                workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+            end
             LoopKillToggle = state
         else
             LoopKillToggle = state
@@ -942,6 +951,7 @@ if game.PlaceId == 155615604 then
         char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
     end)
     local SpectateConnection = nil
+    local viewDied = nil
 
     PlayerController:NewToggle("Spectate", "Wiew player cam", function(state)
         if state then
@@ -949,6 +959,12 @@ if game.PlaceId == 155615604 then
                 task.spawn(function()
                     if PlayerControll.Character then
                         game:GetService("Workspace").CurrentCamera.CameraSubject = PlayerControll.Character
+                        -- from inf yield
+                        local function viewDiedFunc()
+                            repeat wait() until PlayerControll.Character ~= nil 
+                            workspace.CurrentCamera.CameraSubject = PlayerControll.Character
+                        end
+                        viewDied = PlayerControll.CharacterAdded:Connect(viewDiedFunc)
                         local function CameraSubject()
                             game:GetService("Workspace").CurrentCamera.CameraSubject = PlayerControll.Character
                         end
@@ -960,6 +976,7 @@ if game.PlaceId == 155615604 then
            task.spawn(function()
             if SpectateConnection ~= nil then
                 SpectateConnection:Disconnect()
+                viewDied:Disconnect()
             end
             game:GetService("Workspace").CurrentCamera.CameraSubject = char
            end)
@@ -1332,7 +1349,68 @@ if game.PlaceId == 155615604 then
             ["Cframe"] = CFrame.new(0, 0, 0),
             ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
         },
+        [41] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [42] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [43] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [44] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [45] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [46] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [47] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [48] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [49] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [50] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
     }
+
     CrashServer:NewToggle("Crash!", "Make the server laggy roblox will shut down it!", function(state)
         if state == true then
             task.spawn(function()
@@ -1389,12 +1467,16 @@ if game.PlaceId == 155615604 then
                 if plr.Team == "Guards" then
                     task.wait()
                 else
-                    local args = {
-                        [1] = "Bright blue"
-                    }
-                    
-                    workspace.Remote.TeamEvent:FireServer(unpack(args))
-                    RemoteAllDoorLoop = true
+                    if plr.Backpack:FindFirstChild("Keycard") then
+                        RemoteAllDoorLoop = true
+                    else
+                        local args = {
+                            [1] = "Bright blue"
+                        }
+                        
+                        workspace.Remote.TeamEvent:FireServer(unpack(args))
+                        RemoteAllDoorLoop = true
+                    end
                 end
             end)
         else
@@ -1573,68 +1655,47 @@ if game.PlaceId == 155615604 then
 
         if LoopKillToggle == true then
             task.spawn(function()
-                if PlayerControll ~= nil and PlayerController.Character and PlayerController.Character:FindFirstChildWhichIsA("Humanoid") and PlayerController.Character:FindFirstChildWhichIsA("Humanoid").Health <= 0 then
+                if PlayerControll ~= nil and PlayerControll.Character and PlayerControll:FindFirstChildWhichIsA("Humanoid") and not PlayerControll:FindFirstChildWhichIsA("ForceField") then
                     local plrlastteam = nil
-    
-                    if plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-                        task.wait()
-                    else     
-                        local args = {
-                            [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
-                        }
             
-                        workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-                    end
-            
-                    task.wait(.1)
-            
-                    if PlayerControll ~= nil then
-                        local args = {
+                    local args = {
+                        [1] = {
                             [1] = {
-                                [1] = {
-                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-391.1522521972656, 8.655600547790527, -83.21669006347656)),
-                                    ["Distance"] = 3.2524313926697,
-                                    ["Cframe"] = CFrame.new(Vector3.new(840.310791015625, 101.33413696289062, 2267.8798828125), Vector3.new(0.9864164590835571, -0.15174193680286407, -0.06290365755558014)),
-                                    ["Hit"] = PlayerControll.Character.Head
-                                },
-                                [2] = {
-                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-392.4814758300781, -8.449393272399902, -76.72613525390625)),
-                                    ["Distance"] = 3.2699294090271,
-                                    ["Cframe"] = CFrame.new(Vector3.new(840.2904663085938, 101.18418884277344, 2267.93505859375), Vector3.new(0.9935879707336426, -0.05921658128499985, -0.096314437687397)),
-                                    ["Hit"] = PlayerControll.Character.Head
-                                },
-                                [3] = {
-                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-389.2170104980469, -2.5053632259368896, -92.21631622314453)),
-                                    ["Distance"] = 3.1665518283844,
-                                    ["Cframe"] = CFrame.new(Vector3.new(840.3388671875, 101.23649597167969, 2267.8037109375), Vector3.new(0.9954167008399963, -0.09418468177318573, -0.016576465219259262)),
-                                    ["Hit"] = PlayerControll.Character.Head
-                                },
-                                [4] = {
-                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-393.3539733886719, 3.139889717102051, -72.54520416259766)),
-                                    ["Distance"] = 3.3218522071838,
-                                    ["Cframe"] = CFrame.new(Vector3.new(840.2772216796875, 101.28595733642578, 2267.970703125), Vector3.new(0.9859949350357056, -0.11956311762332916, -0.11626961082220078)),
-                                    ["Hit"] = PlayerControll.Character.Head
-                                },
-                                [5] = {
-                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-390.7317199707031, 3.2097764015197754, -85.5477523803711)),
-                                    ["Distance"] = 3.222757101059,
-                                    ["Cframe"] = CFrame.new(Vector3.new(840.3179931640625, 101.28642272949219, 2267.8603515625), Vector3.new(0.9910106658935547, -0.12353070080280304, -0.05136203020811081)),
-                                    ["Hit"] = PlayerControll.Character.Head
-                                }
+                                ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-391.1522521972656, 8.655600547790527, -83.21669006347656)),
+                                ["Distance"] = 3.2524313926697,
+                                ["Cframe"] = CFrame.new(Vector3.new(840.310791015625, 101.33413696289062, 2267.8798828125), Vector3.new(0.9864164590835571, -0.15174193680286407, -0.06290365755558014)),
+                                ["Hit"] = PlayerControll.Character.Head
                             },
-                            [2] = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild("Remington 870")
-                        }
-                        
-                        game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
-                        game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
-                        PlayerControll.Character:FindFirstChildWhichIsA("Humanoid").StateChanged:Connect(function(oldstate, newstate)
-                            if newstate ~= Enum.HumanoidStateType.Dead then
-                                KillPunch = true
-                                task.wait(.5)
-                                KillPunch = false
-                            end
-                        end)
-                    end
+                            [2] = {
+                                ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-392.4814758300781, -8.449393272399902, -76.72613525390625)),
+                                ["Distance"] = 3.2699294090271,
+                                ["Cframe"] = CFrame.new(Vector3.new(840.2904663085938, 101.18418884277344, 2267.93505859375), Vector3.new(0.9935879707336426, -0.05921658128499985, -0.096314437687397)),
+                                ["Hit"] = PlayerControll.Character.Head
+                            },
+                            [3] = {
+                                ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-389.2170104980469, -2.5053632259368896, -92.21631622314453)),
+                                ["Distance"] = 3.1665518283844,
+                                ["Cframe"] = CFrame.new(Vector3.new(840.3388671875, 101.23649597167969, 2267.8037109375), Vector3.new(0.9954167008399963, -0.09418468177318573, -0.016576465219259262)),
+                                ["Hit"] = PlayerControll.Character.Head
+                            },
+                            [4] = {
+                                ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-393.3539733886719, 3.139889717102051, -72.54520416259766)),
+                                ["Distance"] = 3.3218522071838,
+                                ["Cframe"] = CFrame.new(Vector3.new(840.2772216796875, 101.28595733642578, 2267.970703125), Vector3.new(0.9859949350357056, -0.11956311762332916, -0.11626961082220078)),
+                                ["Hit"] = PlayerControll.Character.Head
+                            },
+                            [5] = {
+                                ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-390.7317199707031, 3.2097764015197754, -85.5477523803711)),
+                                ["Distance"] = 3.222757101059,
+                                ["Cframe"] = CFrame.new(Vector3.new(840.3179931640625, 101.28642272949219, 2267.8603515625), Vector3.new(0.9910106658935547, -0.12353070080280304, -0.05136203020811081)),
+                                ["Hit"] = PlayerControll.Character.Head
+                            }
+                        },
+                        [2] = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild("Remington 870")
+                    }
+                    
+                    game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
+                    game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
                 end
             end)
         end
@@ -1650,7 +1711,7 @@ if game.PlaceId == 155615604 then
         end
 
         if AlwaysJumpCheck == true then
-            if Humanoid.FloorMaterial ~= Enum.Material.Air and Humanoid.MoveDirection.X ~= 0 and Humanoid.MoveDirection.Z ~= 0 then
+            if Humanoid.FloorMaterial ~= Enum.Material.Air and Humanoid.MoveDirection.X ~= 0 and Humanoid.MoveDirection.Z ~= 0 and SpeedEnabled == true then
                 Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
             end
         end
