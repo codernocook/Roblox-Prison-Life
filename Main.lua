@@ -8,22 +8,13 @@ if game.PlaceId == 155615604 then
     end
 
     local LibraryUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-    local ScriptWindows = {}
-
-    task.spawn(function()
-        if _G.Theme then
-            ScriptWindows = LibraryUI.CreateLib("Prison Life".."", tostring(_G.Theme))
-        else
-            ScriptWindows = LibraryUI.CreateLib("Prison Life".."", "Sentinel")
-        end
-    end)
+    local ScriptWindows =  LibraryUI.CreateLib("Prison Life".."", "Sentinel")
 
     --Tab--
     local PlayerTab = ScriptWindows:NewTab("Player")
     local BlatantTab = ScriptWindows:NewTab("Blatant")
     local GunTab = ScriptWindows:NewTab("Gun")
     local ServerModerator = ScriptWindows:NewTab("ServerMod")
-    local VisualTab = ScriptWindows:NewTab("Visual")
     local ExploitTab = ScriptWindows:NewTab("Exploit")
     -------
 
@@ -41,8 +32,8 @@ if game.PlaceId == 155615604 then
     local Heartbeat = game:GetService("RunService").Heartbeat
     local Mouse = plr:GetMouse()
     local PlayerInGame = {}
-    local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
     local UserInputService = game:GetService("UserInputService")
+    local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
     --------------
     
 
@@ -91,32 +82,36 @@ if game.PlaceId == 155615604 then
                         end)
                 end)
             else
-                if char:FindFirstChild("Flydude") then
-                    char:WaitForChild("Flydude"):Destroy()
-                end
+            if char:FindFirstChild("Flydude") then
+                char:WaitForChild("Flydude"):Destroy()
+            end
         end
     end)
     --
     local Speed = PlayerTab:NewSection("Speed")
     local SpeedEnabled = false
-    Speed:NewToggle("Toggle", "Improve your movement.", function(state)
+     Speed:NewToggle("Toggle", "Improve your movement.", function(state)
         if state then
             task.spawn(function()
                 SpeedEnabled = true
-                repeat task.wait(.1)
-                    Humanoid.WalkSpeed = tonumber(SpeedNumber)
-                    if SpeedEnabled == false then
-                        break
-                    end
-                until SpeedEnabled == false
             end)
         else
             task.spawn(function()
                 SpeedEnabled = false
-                Humanoid.WalkSpeed = 16
             end)
         end
     end)
+
+    local AlwaysJumpCheck = false
+
+    Speed:NewToggle("AlwaysJump", "Jump when you move.", function(state)
+        if state then
+            AlwaysJumpCheck = state
+        else
+            AlwaysJumpCheck = state
+        end
+    end)
+
     Speed:NewSlider("Speed", "SliderInfo", 500, 16, function(speedcallback)
         task.spawn(function()
             SpeedNumber = tonumber(speedcallback)
@@ -283,6 +278,45 @@ if game.PlaceId == 155615604 then
                 end)
             end
         end)
+
+        local DeathClick = BlatantTab:NewSection("DeathClick")
+        local DeathClickToggle = false
+        DeathClick:NewToggle("Toggle", "Click someone they will die", function(state)
+            if state then
+                DeathClickToggle = true
+            else
+                DeathClickToggle = false
+            end
+        end)
+
+        Mouse.Button1Down:Connect(function(hit)
+            if DeathClickToggle == true and Mouse.Target.Parent:FindFirstChildWhichIsA("Humanoid") then
+                local charclicked = Mouse.Target.Parent
+                local plrclicked = game:GetService("Players"):GetPlayerFromCharacter(charclicked)
+                if plrclicked ~= plr then
+                    for i = 1, 50 do
+                        if (0 - (plrclicked.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude)) < 20 then
+                            local args = {
+                                [1] = plrclicked
+                            }
+            
+                            game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                        else
+                            local PunchOldPos = HumanoidRootPart.CFrame
+                            HumanoidRootPart.CFrame = plrclicked.Character:FindFirstChild("HumanoidRootPart").CFrame or plrclicked.Character:FindFirstChild("Torso").CFrame
+                            task.wait(.1)
+                            local args = {
+                                [1] = plrclicked
+                            }
+            
+                            game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                            task.wait(.1)
+                            HumanoidRootPart.CFrame = PunchOldPos
+                        end
+                    end
+                end
+            end
+         end)
 
         local DeadPunch = BlatantTab:NewSection("DeadPunch")
         local DeadPunchEnabled = false
@@ -636,10 +670,20 @@ if game.PlaceId == 155615604 then
         end)
     end)
 
+    local LoopKillToggle = false
+
+    PlayerController:NewToggle("LoopKill", "Loop kill the player you want!", function(state)
+        if state then
+            LoopKillToggle = state
+        else
+            LoopKillToggle = state
+        end
+    end)
+
     PlayerController:NewButton("Punch", "Punch Player you want!", function()
         if PlayerControll ~= nil then
             if PlayerControll ~= nil then
-                if (PlayerControll.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 20 then
+                if (0 - (PlayerControll.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude)) < 20 then
                     local args = {
                         [1] = PlayerControll
                     }
@@ -1037,32 +1081,252 @@ if game.PlaceId == 155615604 then
             char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
         end)
     end)
+
+
+
     -------------------
-
-    --VisualTab--
-    local Theme = VisualTab:NewSection("Theme")
-    local ThemeChoose = ""
-
-    Theme:NewDropdown("Theme", "Choose theme you like", {"LightTheme", "DarkTheme", "GrapeTheme", "BloodTheme", "Ocean", "Midnight", "Sentinel", "Synapse"}, function(themechoose)
-        task.spawn(function()
-            ThemeChoose = tostring(themechoose)
-        end)
-    end)
-    
-    Theme:NewButton("Change Theme", "Change The Theme", function()
-        _G.Theme = tostring(ThemeChoose)
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/codernocook/prisonlife/main/Main.lua"))()
-    end)
-    -------------
 
     --ExploitTab--
     local CrashServer = ExploitTab:NewSection("ServerCrasher")
-    local MaxCrashPacket = 100
+    local MaxCrashPacket = 20
     local Raypos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
     local RayRotatepos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
-    local PacketCount = 0
     local PacketCrashTable = {
         [1] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [2] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [3] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [4] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [5] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [6] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [7] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [8] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [9] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [10] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [11] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [12] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [13] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [14] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [15] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [16] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [17] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [18] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [19] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [20] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [21] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [22] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [23] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [24] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [25] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [26] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [27] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [28] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [29] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [30] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [31] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [32] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [33] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [34] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [35] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [36] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [37] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [38] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [39] = {
+            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
+            ["Distance"] = 5.194826602935791,
+            ["Cframe"] = CFrame.new(0, 0, 0),
+            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
+        },
+        [40] = {
             ["RayObject"] = Ray.new(Raypos, RayRotatepos),
             ["Distance"] = 5.194826602935791,
             ["Cframe"] = CFrame.new(0, 0, 0),
@@ -1075,12 +1339,14 @@ if game.PlaceId == 155615604 then
                 CrashServerMode = true
                 game:GetService("RunService").Heartbeat:Connect(function()
                     if CrashServerMode == true then
-                        local args = {
-                            [1] = PacketCrashTable,
-                            [2] = GunCrashModule
-                        }
-                        
-                        game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
+                       for crashdude = 1, MaxCrashPacket do
+                            local args = {
+                                [1] = PacketCrashTable,
+                                [2] = GunCrashModule
+                            }
+                            
+                            game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
+                        end
                     else
                         CrashServerMode = false
                     end
@@ -1089,7 +1355,6 @@ if game.PlaceId == 155615604 then
         else
             task.spawn(function()
                 CrashServerMode = false
-                table.clear(PacketCrashTable)
             end)
         end
     end)
@@ -1110,23 +1375,6 @@ if game.PlaceId == 155615604 then
     CrashServer:NewSlider("Packet", "Change Max Crash Packet", 100, 20, function(PacketCallBack)
        task.spawn(function()
             MaxCrashPacket = tonumber(PacketCallBack)
-            table.clear(PacketCrashTable)
-            PacketCount = 0
-            repeat task.wait()
-                PacketCount += 1
-                local PacketTemplate = {
-                    [PacketCount] = {
-                        ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-                        ["Distance"] = 5.194826602935791,
-                        ["Cframe"] = CFrame.new(0, 0, 0),
-                        ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-                    },
-                }
-                table.insert(PacketCrashTable, PacketTemplate)
-                if PacketCount >= MaxCrashPacket then
-                    break
-                end
-            until PacketCount >= MaxCrashPacket
        end)
     end)
 
@@ -1165,6 +1413,25 @@ if game.PlaceId == 155615604 then
                     end
                 end
             end)
+        end
+    end)
+
+    local ConsoleSpammer = ExploitTab:NewSection("ConsoleSpammer")
+    local ConsoleSpammerEnabled = false
+    ConsoleSpammer:NewToggle("Toggle", "Spam server side console error", function(state)
+        if state == true then
+            if game:GetService("ReplicatedStorage"):FindFirstChild("ServerConsoleError") then
+                task.wait()
+            else
+                local InvaldPart = Instance.new("Part", game:GetService("ReplicatedStorage"))
+                InvaldPart.Name = "ServerConsoleError"
+            end
+            ConsoleSpammerEnabled = state
+        else
+            ConsoleSpammerEnabled = state
+            if game:GetService("ReplicatedStorage"):FindFirstChild("ServerConsoleError") then
+                game:GetService("ReplicatedStorage"):FindFirstChild("ServerConsoleError"):Destroy()
+            end
         end
     end)
 
@@ -1270,6 +1537,16 @@ if game.PlaceId == 155615604 then
             end
         end
 
+        if ConsoleSpammerEnabled == true then
+            if game:GetService("ReplicatedStorage"):FindFirstChild("ServerConsoleError") then
+                local args = {
+                    [1] = game:GetService("ReplicatedStorage"):FindFirstChild("ServerConsoleError")
+                }
+                
+                workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+            end
+        end
+
         if KillPunch == true then
             if PlayerControll ~= nil then
                 if PlayerControll.Character:FindFirstChild("HumanoidRootPart") then
@@ -1291,6 +1568,90 @@ if game.PlaceId == 155615604 then
                         LoopTeleportAllowed = false
                     end
                 end
+            end
+        end
+
+        if LoopKillToggle == true then
+            task.spawn(function()
+                if PlayerControll ~= nil and PlayerController.Character and PlayerController.Character:FindFirstChildWhichIsA("Humanoid") and PlayerController.Character:FindFirstChildWhichIsA("Humanoid").Health <= 0 then
+                    local plrlastteam = nil
+    
+                    if plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
+                        task.wait()
+                    else     
+                        local args = {
+                            [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
+                        }
+            
+                        workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+                    end
+            
+                    task.wait(.1)
+            
+                    if PlayerControll ~= nil then
+                        local args = {
+                            [1] = {
+                                [1] = {
+                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-391.1522521972656, 8.655600547790527, -83.21669006347656)),
+                                    ["Distance"] = 3.2524313926697,
+                                    ["Cframe"] = CFrame.new(Vector3.new(840.310791015625, 101.33413696289062, 2267.8798828125), Vector3.new(0.9864164590835571, -0.15174193680286407, -0.06290365755558014)),
+                                    ["Hit"] = PlayerControll.Character.Head
+                                },
+                                [2] = {
+                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-392.4814758300781, -8.449393272399902, -76.72613525390625)),
+                                    ["Distance"] = 3.2699294090271,
+                                    ["Cframe"] = CFrame.new(Vector3.new(840.2904663085938, 101.18418884277344, 2267.93505859375), Vector3.new(0.9935879707336426, -0.05921658128499985, -0.096314437687397)),
+                                    ["Hit"] = PlayerControll.Character.Head
+                                },
+                                [3] = {
+                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-389.2170104980469, -2.5053632259368896, -92.21631622314453)),
+                                    ["Distance"] = 3.1665518283844,
+                                    ["Cframe"] = CFrame.new(Vector3.new(840.3388671875, 101.23649597167969, 2267.8037109375), Vector3.new(0.9954167008399963, -0.09418468177318573, -0.016576465219259262)),
+                                    ["Hit"] = PlayerControll.Character.Head
+                                },
+                                [4] = {
+                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-393.3539733886719, 3.139889717102051, -72.54520416259766)),
+                                    ["Distance"] = 3.3218522071838,
+                                    ["Cframe"] = CFrame.new(Vector3.new(840.2772216796875, 101.28595733642578, 2267.970703125), Vector3.new(0.9859949350357056, -0.11956311762332916, -0.11626961082220078)),
+                                    ["Hit"] = PlayerControll.Character.Head
+                                },
+                                [5] = {
+                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-390.7317199707031, 3.2097764015197754, -85.5477523803711)),
+                                    ["Distance"] = 3.222757101059,
+                                    ["Cframe"] = CFrame.new(Vector3.new(840.3179931640625, 101.28642272949219, 2267.8603515625), Vector3.new(0.9910106658935547, -0.12353070080280304, -0.05136203020811081)),
+                                    ["Hit"] = PlayerControll.Character.Head
+                                }
+                            },
+                            [2] = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild("Remington 870")
+                        }
+                        
+                        game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
+                        game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
+                        PlayerControll.Character:FindFirstChildWhichIsA("Humanoid").StateChanged:Connect(function(oldstate, newstate)
+                            if newstate ~= Enum.HumanoidStateType.Dead then
+                                KillPunch = true
+                                task.wait(.5)
+                                KillPunch = false
+                            end
+                        end)
+                    end
+                end
+            end)
+        end
+
+        if SpeedEnabled == true then
+            if Humanoid.MoveDirection.Magnitude > 0 then
+                if SpeedNumber and char and Humanoid and Humanoid.Parent then
+                    char:TranslateBy(Humanoid.MoveDirection * tonumber(SpeedNumber/500))
+                else
+                    char:TranslateBy(Humanoid.MoveDirection)
+                end
+            end
+        end
+
+        if AlwaysJumpCheck == true then
+            if Humanoid.FloorMaterial ~= Enum.Material.Air and Humanoid.MoveDirection.X ~= 0 and Humanoid.MoveDirection.Z ~= 0 then
+                Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
             end
         end
 
