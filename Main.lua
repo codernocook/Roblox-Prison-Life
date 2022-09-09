@@ -1108,6 +1108,7 @@ if game.PlaceId == 155615604 then
     local MaxCrashPacket = 20
     local Raypos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
     local RayRotatepos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+    local CrashServerType = "GunCrash"
     local PacketCrashTable = {
         [1] = {
             ["RayObject"] = Ray.new(Raypos, RayRotatepos),
@@ -1414,27 +1415,26 @@ if game.PlaceId == 155615604 then
     CrashServer:NewToggle("Crash!", "Make the server laggy roblox will shut down it!", function(state)
         if state == true then
             task.spawn(function()
+                if CrashServerType == "Tool" then
+                    local args = {
+                        [1] = "Bright blue"
+                    }
+                    
+                    workspace.Remote.TeamEvent:FireServer(unpack(args))
+                end
                 CrashServerMode = true
-                game:GetService("RunService").Heartbeat:Connect(function()
-                    if CrashServerMode == true then
-                       for crashdude = 1, MaxCrashPacket do
-                            local args = {
-                                [1] = PacketCrashTable,
-                                [2] = GunCrashModule
-                            }
-                            
-                            game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
-                        end
-                    else
-                        CrashServerMode = false
-                    end
-                end)
             end)
         else
             task.spawn(function()
                 CrashServerMode = false
             end)
         end
+    end)
+
+    CrashServer:NewDropdown("CrashType", "Choose Type of server crash", {"GunCrash", "CarSpamCrash", "Tool", "PunchCrash"}, function(crashchoose)
+        task.spawn(function()
+            CrashServerType = tostring(crashchoose)
+        end)
     end)
 
     CrashServer:NewDropdown("GunCrash", "Choose your gun", {"Remington 870", "M9", "AK-47"}, function(toolselect)
@@ -1709,6 +1709,48 @@ if game.PlaceId == 155615604 then
                 end
             end
         end
+
+        if CrashServerMode == true then
+            if CrashServerType == "GunCrash" then
+                for crashdude = 1, MaxCrashPacket do
+                    local args = {
+                        [1] = PacketCrashTable,
+                        [2] = GunCrashModule
+                    }
+                    
+                    game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
+                end
+            elseif CrashServerType == "CarSpamCrash" then
+                for carspam = 1, MaxCrashPacket do
+                    local args = {
+                        [1] = workspace.Prison_ITEMS.buttons:FindFirstChild("Car Spawner"):FindFirstChild("Car Spawner")
+                    }
+
+                    workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+                end
+            elseif CrashServerType == "Tool" then
+                if char and Humanoid and HumanoidRootPart then
+                    local oldpos = HumanoidRootPart.CFrame
+                    Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+                    local args = {
+                        [1] = plr.Name
+                    }
+                    
+                    workspace.Remote.loadchar:InvokeServer(unpack(args))
+                    HumanoidRootPart.CFrame = oldpos
+                end
+            elseif CrashServerType == "PunchCrash" then
+                for punchforkill = 1, MaxCrashPacket do
+                    for i, playerinpair in pairs(game:GetService("Players"):GetPlayers()) do
+                        local args = {
+                            [1] = playerinpair
+                        }
+        
+                        game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                    end
+                end
+            end
+         end
 
         if AlwaysJumpCheck == true then
             if Humanoid.FloorMaterial ~= Enum.Material.Air and Humanoid.MoveDirection.X ~= 0 and Humanoid.MoveDirection.Z ~= 0 and SpeedEnabled == true then
