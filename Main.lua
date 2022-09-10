@@ -1894,7 +1894,7 @@ if game.PlaceId == 155615604 then
 
         if LoopKillToggle == true then
             task.spawn(function()
-                if PlayerControll ~= nil and PlayerControll.Character and PlayerControll:FindFirstChildWhichIsA("Humanoid") and not PlayerControll:FindFirstChildWhichIsA("ForceField") then
+                if PlayerControll ~= nil and PlayerControll.Character then
                     local plrlastteam = nil
             
                     local args = {
@@ -1953,7 +1953,6 @@ if game.PlaceId == 155615604 then
         if HackerDetectorEnabled == true then
             local AlreadyTeamDetect = {}
             for i, v in pairs(game:GetService("Players"):GetPlayers()) do
-                local char = v.Character or v.CharacterAdded
                 if v ~= game:GetService("Players").LocalPlayer then
                     if v.Team == nil then
                         task.spawn(function()
