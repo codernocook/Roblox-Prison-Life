@@ -1642,6 +1642,13 @@ if game.PlaceId == 155615604 then
     CrashServer:NewToggle("Crash!", "Make the server laggy roblox will shut down it!", function(state)
         if state == true then
             task.spawn(function()
+                if CrashServerType == "RespawnCrash" then
+                    local args = {
+                        [1] = "Bright blue"
+                    }
+                    
+                    workspace.Remote.TeamEvent:FireServer(unpack(args))
+                end
                 CrashServerMode = true
             end)
         else
@@ -2025,11 +2032,13 @@ if game.PlaceId == 155615604 then
                     if char and Humanoid and HumanoidRootPart then
                         local oldpos = HumanoidRootPart.CFrame
                         Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+                        task.wait(.1)
                         local args = {
                             [1] = plr.Name
                         }
                         
                         workspace.Remote.loadchar:InvokeServer(unpack(args))
+                        task.wait(.1)
                         HumanoidRootPart.CFrame = oldpos
                     end
                 end
