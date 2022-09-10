@@ -1608,6 +1608,16 @@ if game.PlaceId == 155615604 then
         end
     end)
 
+    local HackerDetector = ExploitTab:NewSection("HackerDetector")
+    local HackerDetectorEnabled = false
+    HackerDetector:NewToggle("Toggle", "Check if someone exploiting or hacking!", function(state)
+        if state == true then
+            HackerDetectorEnabled = true
+        else
+            HackerDetectorEnabled = false
+        end
+    end)
+
     --------------
     game:GetService("RunService").Heartbeat:Connect(function()
         char = plr.Character or plr.CharacterAdded
@@ -1761,6 +1771,69 @@ if game.PlaceId == 155615604 then
                 else
                     char:TranslateBy(Humanoid.MoveDirection)
                 end
+            end
+        end
+
+        if HackerDetectorEnabled == true then
+            local AlreadyTeamDetect = {}
+            for i, v in pairs(game:GetService("Players"):GetPlayers()) do
+                local char = v.Character or v.CharacterAdded
+                if v ~= game:GetService("Players").LocalPlayer then
+                    if v.Team == nil then
+                        task.spawn(function()
+                            for i, TeamDetectRun in pairs(AlreadyTeamDetect) do
+                                if not TeamDetectRun:FindFirstChild(v.Name) and HackerDetectorEnabled == true then
+                                    game:GetService("StarterGui"):SetCore("ChatMakeSystemMessage",{
+                                        Text = tostring(v.Name).." Black Dark Team Detected!",
+                                        Font = Enum.Font.SourceSansBold,
+                                        TextSize = 20,
+                                        Color = Color3.new(255, 255, 255)
+                                    })
+                                    table.insert(AlreadyTeamDetect, v.Name)
+                                end
+                            end
+                        end)
+                    end
+
+                    if char:FindFirstChild("HumanoidRootPart") then
+                        task.spawn(function()
+                            local anotherguychar = v.Character or v.CharacterAdded
+                                local AnotherHumanoidRootPart = anotherguychar:WaitForChild("HumanoidRootPart")
+                                local OldPos = AnotherHumanoidRootPart.Position
+                                task.wait(1)
+                                local NewPos = AnotherHumanoidRootPart.Position
+                                if anotherguychar:FindFirstChildWhichIsA("Humanoid") and Humanoid.MoveDirection.X ~= 0 and Humanoid.MoveDirection.Z ~= 0 and HackerDetectorEnabled == true then
+                                    if (NewPos - OldPos).Magnitude > 80 and anotherguychar:FindFirstChildWhichIsA("Humanoid").Sit == false then
+                                        game:GetService("StarterGui"):SetCore("ChatMakeSystemMessage",{
+                                            Text = tostring(v.Name).." Speed Cheating, Type: Can't Detect!",
+                                            Font = Enum.Font.SourceSansBold,
+                                            TextSize = 20,
+                                            Color = Color3.new(255, 255, 255)
+                                        })
+                                    end
+                                end
+                                if anotherguychar:FindFirstChildWhichIsA("Humanoid") and Humanoid.MoveDirection.X ~= 0 and Humanoid.MoveDirection.Z ~= 0 and HackerDetectorEnabled == true then
+                                    if anotherguychar:FindFirstChildWhichIsA("Humanoid").PlatformStand == true then
+                                        game:GetService("StarterGui"):SetCore("ChatMakeSystemMessage",{
+                                            Text = tostring(v.Name).." Fly Cheating, Type: Normal!",
+                                            Font = Enum.Font.SourceSansBold,
+                                            TextSize = 20,
+                                            Color = Color3.new(255, 255, 255)
+                                        })
+                                    end
+                                end
+
+                                if not anotherguychar:FindFirstChildWhichIsA("Humanoid") then
+                                    game:GetService("StarterGui"):SetCore("ChatMakeSystemMessage",{
+                                        Text = tostring(v.Name).." No Humanoid Detector, Type: RE!",
+                                        Font = Enum.Font.SourceSansBold,
+                                        TextSize = 20,
+                                        Color = Color3.new(255, 255, 255)
+                                    })
+                                end
+                            end)
+                        end
+                    end
             end
         end
 
