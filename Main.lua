@@ -90,6 +90,8 @@ if game.PlaceId == 155615604 then
     --
     local Speed = PlayerTab:NewSection("Speed")
     local SpeedEnabled = false
+    local SpeedJumpPower = 10
+    
      Speed:NewToggle("Toggle", "Improve your movement.", function(state)
         if state then
             task.spawn(function()
@@ -115,6 +117,12 @@ if game.PlaceId == 155615604 then
     Speed:NewSlider("Speed", "SliderInfo", 500, 16, function(speedcallback)
         task.spawn(function()
             SpeedNumber = tonumber(speedcallback)
+        end)
+    end)
+
+    Speed:NewSlider("JumpPower", "SliderInfo", 100, 10, function(jumppowercallback)
+        task.spawn(function()
+            SpeedJumpPower = tonumber(jumppowercallback)
         end)
     end)
 
@@ -1748,6 +1756,7 @@ if game.PlaceId == 155615604 then
             if Humanoid.MoveDirection.Magnitude > 0 then
                 if SpeedNumber and char and Humanoid and Humanoid.Parent then
                     char:TranslateBy(Humanoid.MoveDirection * tonumber(SpeedNumber/500))
+                    Humanoid.JumpPower = tonumber(SpeedJumpPower)
                 else
                     char:TranslateBy(Humanoid.MoveDirection)
                 end
