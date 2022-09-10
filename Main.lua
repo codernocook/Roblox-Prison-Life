@@ -115,15 +115,36 @@ if game.PlaceId == 155615604 then
         end
     end)
 
-    Speed:NewSlider("Speed", "SliderInfo", 500, 16, function(speedcallback)
+    Speed:NewSlider("Speed", "", 500, 16, function(speedcallback)
         task.spawn(function()
             SpeedNumber = tonumber(speedcallback)
         end)
     end)
 
-    Speed:NewSlider("JumpPower", "SliderInfo", 100, 10, function(jumppowercallback)
+    Speed:NewSlider("JumpPower", "", 50, 10, function(jumppowercallback)
         task.spawn(function()
             SpeedJumpPower = tonumber(jumppowercallback)
+        end)
+    end)
+
+    local JumpPower = PlayerTab:NewSection("JumpPower")
+    local JumpPowerRecord = 50
+
+    JumpPowerRecord:NewToggle("Toggle", "Make you jump higher.", function(state)
+        if state then
+            task.spawn(function()
+                Humanoid.JumpPower = tonumber(JumpPowerRecord)
+            end)
+        else
+            task.spawn(function()
+                Humanoid.JumpPower = 50
+            end)
+        end
+    end)
+
+    JumpPower:NewSlider("JumpPower", "", 500, 50, function(jumppowerrecordcallback)
+        task.spawn(function()
+            JumpPowerRecord = tonumber(jumppowerrecordcallback)
         end)
     end)
 
