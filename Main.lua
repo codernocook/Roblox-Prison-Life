@@ -1415,6 +1415,7 @@ if game.PlaceId == 155615604 then
     CrashServer:NewToggle("Crash!", "Make the server laggy roblox will shut down it!", function(state)
         if state == true then
             task.spawn(function()
+                local clonechar = char:Clone()
                 if CrashServerType == "Tool" then
                     local args = {
                         [1] = "Bright blue"
@@ -1423,6 +1424,8 @@ if game.PlaceId == 155615604 then
                     workspace.Remote.TeamEvent:FireServer(unpack(args))
                 end
                 CrashServerMode = true
+                clonechar.Parent = game:GetService("Workspace")
+                game:GetService("Workspace").CurrentCamera = clonechar
             end)
         else
             task.spawn(function()
