@@ -1569,20 +1569,6 @@ if game.PlaceId == 155615604 then
         if state then
             task.spawn(function()
                 GodModeEnabled = true
-                repeat task.wait(.1)
-                    Humanoid:Destroy()
-                    Instance.new("Humanoid", char)
-                    char.Animate.Disabled = true
-                    game:GetService("Workspace").CurrentCamera.CameraSubject = char
-                    task.wait(tonumber(game:GetService("Players").RespawnTime))
-                    savedCFrame = HumanoidRootPart.CFrame
-                    game:GetService("Workspace").Remote.loadchar:InvokeServer(plr.Name)
-                    HumanoidRootPart.CFrame = savedCFrame
-                    savedCFrame = HumanoidRootPart.CFrame
-                    if GodModeEnabled == false then
-                        break
-                    end
-                until GodModeEnabled == false
             end)
         else
             task.spawn(function()
@@ -1597,6 +1583,19 @@ if game.PlaceId == 155615604 then
                 task.wait(.1)
                 HumanoidRootPart.CFrame = oldpos
             end)
+        end
+    end)
+
+    Humanoid.StateChanged:Connect(function(oldstate, newstate)
+        if newstate == Enum.HumanoidStateType.Dead and GodMode == true then
+            local godmodoldpos = HumanoidRootPart.CFrame
+            local args = {
+                [1] = plr.Name
+            }
+            
+            workspace.Remote.loadchar:InvokeServer(unpack(args))
+            task.wait(.1)
+            HumanoidRootPart.CFrame = godmodoldpos
         end
     end)
 
