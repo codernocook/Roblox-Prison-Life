@@ -130,7 +130,7 @@ if game.PlaceId == 155615604 then
     local JumpPower = PlayerTab:NewSection("JumpPower")
     local JumpPowerRecord = 50
 
-    JumpPowerRecord:NewToggle("Toggle", "Make you jump higher.", function(state)
+    JumpPower:NewToggle("Toggle", "Make you jump higher.", function(state)
         if state then
             task.spawn(function()
                 Humanoid.JumpPower = tonumber(JumpPowerRecord)
