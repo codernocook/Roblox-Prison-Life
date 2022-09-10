@@ -91,7 +91,7 @@ if game.PlaceId == 155615604 then
     local Speed = PlayerTab:NewSection("Speed")
     local SpeedEnabled = false
     local SpeedJumpPower = 10
-    
+
      Speed:NewToggle("Toggle", "Improve your movement.", function(state)
         if state then
             task.spawn(function()
@@ -100,6 +100,7 @@ if game.PlaceId == 155615604 then
         else
             task.spawn(function()
                 SpeedEnabled = false
+                Humanoid.JumpPower = 50
             end)
         end
     end)
