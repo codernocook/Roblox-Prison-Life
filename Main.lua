@@ -781,6 +781,50 @@ if game.PlaceId == 155615604 then
        end)
     end)
 
+    local LoopTeleportBring = false
+
+    PlayerController:NewButton("Criminal", "Turn player you want into criminal", function()
+        local loadcharbefore = {
+            [1] = plr.Name
+        }
+
+        workspace.Remote.loadchar:InvokeServer(unpack(loadcharbefore))
+
+        local oldposbeforebring = char:WaitForChild("HumanoidRootPart").CFrame
+
+        local Knifepickup = {
+            [1] = workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP
+        }
+
+        workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
+
+        task.wait(.1)
+
+        char:FindFirstChildWhichIsA("Humanoid"):Destroy()
+        Instance.new("Humanoid", char)
+
+        if plr.Backpack:FindFirstChild("Crude Knife") then
+            plr.Backpack:WaitForChild("Crude Knife").Parent = char
+        elseif char:FindFirstChild("Crude Knife") then
+            task.wait()
+        elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
+            workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
+            plr.Backpack:WaitForChild("Crude Knife").Parent = char
+        end
+        LoopTeleportBring = true
+        task.wait(.5)
+        LoopTeleportBring = false
+        char:WaitForChild("HumanoidRootPart").CFrame = game:GetService("Workspace"):WaitForChild("Criminals Spawn"):WaitForChild("SpawnLocation").CFrame
+        task.wait(.5)
+        local loadcharafter = {
+            [1] = plr.Name
+        }
+
+        workspace.Remote.loadchar:InvokeServer(unpack(loadcharafter))
+        task.wait(.1)
+        char:WaitForChild("HumanoidRootPart").CFrame = oldposbeforebring
+    end)
+
     PlayerController:NewButton("Freeze", "Using Taser to make player freeze", function()
         task.spawn(function()
             if plr.Team == "Guards" then
@@ -856,8 +900,6 @@ if game.PlaceId == 155615604 then
             end
         end)
     end)
-
-    local LoopTeleportBring = false
 
     PlayerController:NewButton("Bring", "Bring player you want to you!", function()
         local loadcharbefore = {
@@ -1745,11 +1787,15 @@ if game.PlaceId == 155615604 then
             elseif CrashServerType == "PunchCrash" then
                 for punchforkill = 1, MaxCrashPacket do
                     for i, playerinpair in pairs(game:GetService("Players"):GetPlayers()) do
-                        local args = {
-                            [1] = playerinpair
-                        }
-        
-                        game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                        local plrrandom = playerinpair.Name[math.random(1, #playerinpair.Name)]
+                        if plrrandom.Character and plrrandom.Character:FindFirstChild("HumanoidRootPart") then
+                            HumanoidRootPart.CFrame = plrrandom.Character:FindFirstChild("HumanoidRootPart").CFrame
+                            local args = {
+                                [1] = plrrandom
+                            }
+            
+                            game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
+                        end
                     end
                 end
             end
