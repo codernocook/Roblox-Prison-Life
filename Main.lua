@@ -1817,6 +1817,8 @@ if game.PlaceId == 155615604 then
                 end
             end
         end
+
+        Humanoid = char:FindFirstChildWhichIsA("Humanoid")
     end)
 
     game:GetService("Players").PlayerAdded:Connect(function()
