@@ -47,6 +47,17 @@ if game.PlaceId == 155615604 then
         end
     end)
 
+    function loadchar()
+        if (not tostring(plr.TeamColor)) then return end;
+        if (tostring(plr.TeamColor) == "Really red" or tostring(plr.TeamColor) == "Medium stone grey") then return "fail" end;
+        local args = {
+            [1] = tostring(plr.TeamColor)
+        }
+        
+        workspace:WaitForChild("Remote"):WaitForChild("TeamEvent"):FireServer(unpack(args))
+        return "success";
+    end
+
     --PlayerTab
     local Fly = PlayerTab:NewSection("Fly")
     Fly:NewToggle("Toggle", "Make you character Fly.", function(state)
@@ -159,21 +170,12 @@ if game.PlaceId == 155615604 then
     local Character = PlayerTab:NewSection("Character")
     Character:NewButton("LoadCharacter", "Make your character respawn server side type", function()
         task.spawn(function()
-            local args = {
-                [1] = plr.Name
-            }
-            
-            workspace.Remote.loadchar:InvokeServer(unpack(args))
+            loadchar()
         end)
     end)
     Character:NewButton("RemoveCharacter", "Remove your Character", function()
        task.spawn(function()
-            local args = {
-                [1] = plr,
-                [2] = "Medium stone grey"
-            }
-            
-            workspace.Remote.loadchar:InvokeServer(unpack(args))
+        loadchar()
        end)
     end)
 
@@ -231,12 +233,7 @@ if game.PlaceId == 155615604 then
         task.spawn(function()
             local oldpos = char:WaitForChild("HumanoidRootPart").CFrame
             task.wait(.1)
-            local args = {
-                [1] = plr,
-                [2] = "Really black"
-            }
-
-            workspace.Remote.loadchar:InvokeServer(unpack(args))
+            loadchar()
             task.wait(.1)
             char:WaitForChild("HumanoidRootPart").CFrame = oldpos
         end)
@@ -1757,25 +1754,17 @@ if game.PlaceId == 155615604 then
                 GodModeEnabled = false
                 local oldpos = HumanoidRootPart.CFrame
                 task.wait(.1)
-                local args = {
-                    [1] = plr.Name
-                }
-                
-                workspace.Remote.loadchar:InvokeServer(unpack(args))
+                loadchar()
                 task.wait(.1)
                 HumanoidRootPart.CFrame = oldpos
             end)
         end
     end)
 
-    Humanoid.StateChanged:Connect(function(oldstate, newstate)
+    Humanoid.Died:Connect(function()
         if newstate == Enum.HumanoidStateType.Dead and GodMode == true then
             local godmodoldpos = HumanoidRootPart.CFrame
-            local args = {
-                [1] = plr.Name
-            }
-            
-            workspace.Remote.loadchar:InvokeServer(unpack(args))
+            loadchar()
             task.wait(.1)
             HumanoidRootPart.CFrame = godmodoldpos
         end
@@ -2037,7 +2026,7 @@ if game.PlaceId == 155615604 then
                             [1] = plr.Name
                         }
                         
-                        workspace.Remote.loadchar:InvokeServer(unpack(args))
+                        loadchar()
                         task.wait(.1)
                         HumanoidRootPart.CFrame = oldpos
                     end
