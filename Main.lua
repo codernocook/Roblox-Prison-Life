@@ -399,27 +399,58 @@ if game.PlaceId == 155615604 then
 
     --GunTab--
     local GiveGun = GunTab:NewSection("Give gun")
+    local gunGetCoolDown = false;
 
     GiveGun:NewButton("Give Choosen gun", "Get your gun you want.", function()
         task.spawn(function()
             if GunChoose == "Remington 870" then
+                if (gunGetCoolDown == true) then return end;
+                gunGetCoolDown = true;
+                if (not plr.Character) then return end;
+                if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
+                local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
+                plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(821.489197, 94.5960846, 2249.05493);
+                plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true
                 local args = {
                     [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
                 }
 
                 workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+                plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
+                plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
+                gunGetCoolDown = false;
             elseif GunChoose == "M9" then
+                if (gunGetCoolDown == true) then return end;
+                gunGetCoolDown = true;
+                if (not plr.Character) then return end;
+                if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
+                local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
+                plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(821.489197, 94.5960846, 2249.05493);
+                plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
                 local args = {
                     [1] = workspace.Prison_ITEMS.giver:FindFirstChild("M9").ITEMPICKUP
                 }
 
                 workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+                plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
+                plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
+                gunGetCoolDown = false;
             elseif GunChoose == "AK-47" then
+            if (gunGetCoolDown == true) then return end;
+                gunGetCoolDown = true;
+                if (not plr.Character) then return end;
+                if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
+                local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
+                plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(-937.779053, 86.7388382, 2056.79199);
+                plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
                 local args = {
                     [1] = workspace.Prison_ITEMS.giver:FindFirstChild("AK-47").ITEMPICKUP
                 }
 
                 workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+                plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
+                plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
+                gunGetCoolDown = false;
             end
         end)
     end)
@@ -1757,16 +1788,18 @@ if game.PlaceId == 155615604 then
                 loadchar()
                 task.wait(.1)
                 HumanoidRootPart.CFrame = oldpos
+                HumanoidRootPart.Position = HumanoidRootPart.Position
             end)
         end
     end)
 
     Humanoid.Died:Connect(function()
-        if newstate == Enum.HumanoidStateType.Dead and GodMode == true then
+        if GodMode == true then
             local godmodoldpos = HumanoidRootPart.CFrame
             loadchar()
             task.wait(.1)
             HumanoidRootPart.CFrame = godmodoldpos
+            HumanoidRootPart.Position = HumanoidRootPart.Position
         end
     end)
 
