@@ -82,7 +82,7 @@ if game.PlaceId == 155615604 then
             }
 
             workspace:FindFirstChild("Remote"):FindFirstChild("ItemHandler"):InvokeServer(unpack(args))
-            task.wait(.5);
+            task.wait(1);
             plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
             plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
         elseif itemSent == "M9" then
@@ -96,7 +96,7 @@ if game.PlaceId == 155615604 then
             }
 
             workspace:FindFirstChild("Remote"):FindFirstChild("ItemHandler"):InvokeServer(unpack(args))
-            task.wait(.5);
+            task.wait(1);
             plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
             plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
         elseif itemSent == "AK-47" then
@@ -110,7 +110,7 @@ if game.PlaceId == 155615604 then
             }
 
             workspace:FindFirstChild("Remote"):FindFirstChild("ItemHandler"):InvokeServer(unpack(args))
-            task.wait(.5);
+            task.wait(1);
             plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
             plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false;
         elseif itemSent == "Knife" then
@@ -130,7 +130,7 @@ if game.PlaceId == 155615604 then
                     workspace.Remote.ItemHandler:InvokeServer(unpack(args))
                 end
             end
-            task.wait(.5);
+            task.wait(1);
             plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
             plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
             elseif itemSent == "Knife" then
@@ -144,7 +144,7 @@ if game.PlaceId == 155615604 then
                 }
     
                 workspace:FindFirstChild("Remote"):FindFirstChild("ItemHandler"):InvokeServer(unpack(args))
-                task.wait(.5);
+                task.wait(1);
                 plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
                 plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
         end
