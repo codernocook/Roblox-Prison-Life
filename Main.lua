@@ -76,12 +76,13 @@ if game.PlaceId == 155615604 then
             if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
             local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
             plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(821.489197, 94.5960846, 2249.05493);
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true
             local args = {
                 [1] = workspace:FindFirstChild("Prison_ITEMS"):FindFirstChild("giver"):FindFirstChild("Remington 870"):FindFirstChild("ITEMPICKUP")
             }
 
             workspace:FindFirstChild("Remote"):FindFirstChild("ItemHandler"):InvokeServer(unpack(args))
+            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(821.489197, 94.5960846, 2249.05493);
+            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
             task.wait(1);
             plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
             plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
@@ -90,12 +91,13 @@ if game.PlaceId == 155615604 then
             if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
             local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
             plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(821.489197, 94.5960846, 2249.05493);
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
             local args = {
                 [1] = workspace:FindFirstChild("Prison_ITEMS"):FindFirstChild("giver"):FindFirstChild("M9"):FindFirstChild("ITEMPICKUP")
             }
 
             workspace:FindFirstChild("Remote"):FindFirstChild("ItemHandler"):InvokeServer(unpack(args))
+            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(821.489197, 94.5960846, 2249.05493);
+            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
             task.wait(1);
             plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
             plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
@@ -104,12 +106,13 @@ if game.PlaceId == 155615604 then
             if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
             local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
             plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(-937.779053, 86.7388382, 2056.79199);
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
             local args = {
                 [1] = workspace:FindFirstChild("Prison_ITEMS"):FindFirstChild("giver"):FindFirstChild("AK-47"):FindFirstChild("ITEMPICKUP")
             }
 
             workspace:FindFirstChild("Remote"):FindFirstChild("ItemHandler"):InvokeServer(unpack(args))
+            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(-937.779053, 86.7388382, 2056.79199);
+            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
             task.wait(1);
             plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
             plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false;
@@ -118,7 +121,6 @@ if game.PlaceId == 155615604 then
             if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
             local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
             plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(707.159729, 89.8002167, 2502.80371);
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
             local getKnifeDisabler = false;
             for _,v in pairs(workspace:FindFirstChild("Prison_ITEMS"):FindFirstChild("single"):GetChildren()) do
                 if (getKnifeDisabler == true) then return end;
@@ -130,23 +132,26 @@ if game.PlaceId == 155615604 then
                     workspace.Remote.ItemHandler:InvokeServer(unpack(args))
                 end
             end
+            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(707.159729, 89.8002167, 2502.80371);
+            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
             task.wait(1);
             plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
             plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
-            elseif itemSent == "Knife" then
-                if (not plr.Character) then return end;
-                if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
-                local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
-                plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(773.345642, 90.5059586, 2522.83643);
-                plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
-                local args = {
-                    [1] = workspace:FindFirstChild("Prison_ITEMS"):FindFirstChild("single"):FindFirstChild("Hammer"):FindFirstChild("ITEMPICKUP")
-                }
+        elseif itemSent == "Hammer" then
+            if (not plr.Character) then return end;
+            if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
+            local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
+            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(773.345642, 90.5059586, 2522.83643);
+            local args = {
+                [1] = workspace:FindFirstChild("Prison_ITEMS"):FindFirstChild("single"):FindFirstChild("Hammer"):FindFirstChild("ITEMPICKUP")
+            }
     
-                workspace:FindFirstChild("Remote"):FindFirstChild("ItemHandler"):InvokeServer(unpack(args))
-                task.wait(1);
-                plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
-                plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
+            workspace:FindFirstChild("Remote"):FindFirstChild("ItemHandler"):InvokeServer(unpack(args))
+            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(773.345642, 90.5059586, 2522.83643);
+            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
+            task.wait(1);
+            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
+            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
         end
     end
 
