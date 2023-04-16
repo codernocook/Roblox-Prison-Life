@@ -56,6 +56,7 @@ if game.PlaceId == 155615604 then
             }
             
             workspace.Remote.TeamEvent:FireServer(unpack(args))
+            repeat task.wait() until char and HumanoidRootPart;
             firetouchinterest(char:FindFirstChild("Head"), game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation"), 0)
             task.wait(.1)
             firetouchinterest(char:FindFirstChild("Head"), game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation"), 1)
@@ -279,21 +280,31 @@ if game.PlaceId == 155615604 then
     local Team = PlayerTab:NewSection("Team")
     Team:NewButton("Guards", "Change your team to Guards", function()
         task.spawn(function()
+            local oldCFrame = HumanoidRootPart.CFrame or "undefined";
             local args = {
                 [1] = "Bright blue"
             }
             
             workspace.Remote.TeamEvent:FireServer(unpack(args))
+            repeat task.wait() until char and HumanoidRootPart;
+            if (not oldCFrame == "undefined") then
+                HumanoidRootPart.CFrame = oldCFrame;
+            end;
         end)
     end)
 
     Team:NewButton("Inmates", "Change your team to Inmates", function()
         task.spawn(function()
+            local oldCFrame = HumanoidRootPart.CFrame or "undefined";
             local args = {
                 [1] = "Bright orange"
             }
             
             workspace.Remote.TeamEvent:FireServer(unpack(args))
+            repeat task.wait() until char and HumanoidRootPart;
+            if (not oldCFrame == "undefined") then
+                HumanoidRootPart.CFrame = oldCFrame;
+            end;
         end)
     end)
 
@@ -310,11 +321,16 @@ if game.PlaceId == 155615604 then
     Team:NewButton("Criminals", "Change your team to Criminals", function()
         task.spawn(function()
             if plr.Team == "Guards" or plr.Team == "Neutral" or plr.Team == "Criminals" or plr.Team == nil or plr.Team == "" then
+                local oldCFrame = HumanoidRootPart.CFrame or "undefined";
                 local args = {
                     [1] = "Bright orange"
                 }
                 
                 workspace.Remote.TeamEvent:FireServer(unpack(args))
+                repeat task.wait() until char and HumanoidRootPart;
+                if (not oldCFrame == "undefined") then
+                    HumanoidRootPart.CFrame = oldCFrame;
+                end;
                 firetouchinterest(char:FindFirstChild("Head"), game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation"), 0)
                 task.wait(.1)
                 firetouchinterest(char:FindFirstChild("Head"), game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation"), 1)
@@ -1765,22 +1781,26 @@ if game.PlaceId == 155615604 then
     end)
 
     local GodMode = ExploitTab:NewSection("GodMode")
-    local GodModeEnabled = false
+    local GodModeEnabled = nil;
 
     GodMode:NewToggle("GodMode", "Turn you into god!", function(state)
         if state then
             task.spawn(function()
-                GodModeEnabled = true
+                if (not Humanoid or not HumanoidRootPart) then return end;
+                local oldCFrame = nil;
+                GodModeEnabled = Humanoid.Died:Connect(function()
+                    oldCFrame = HumanoidRootPart.CFrame;
+                    loadchar();
+                    task.wait(.1);
+                    if (oldCFrame == nil) then return end;
+                    HumanoidRootPart.CFrame = oldCFrame;
+                    oldCFrame = nil;
+                end)
             end)
         else
             task.spawn(function()
-                GodModeEnabled = false
-                local oldpos = HumanoidRootPart.CFrame
-                task.wait(.1)
-                loadchar()
-                task.wait(.1)
-                HumanoidRootPart.CFrame = oldpos
-                HumanoidRootPart.Position = HumanoidRootPart.Position
+                GodModeEnabled:Disconnect()
+                GodModeEnabled = nil;
             end)
         end
     end)
