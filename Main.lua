@@ -1796,9 +1796,9 @@ if game.PlaceId == 155615604 then
                         char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
                         oldCFrame = HumanoidRootPart.CFrame;
                         loadchar();
-                        repeat task.wait() until HumanoidRootPart;
+                        repeat task.wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart");
                         if (oldCFrame == nil) then return end;
-                        HumanoidRootPart.CFrame = oldCFrame;
+                        plr.Character:FindFirstChild("HumanoidRootPart").CFrame = oldCFrame;
                         oldCFrame = nil;
                         char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
                     end)
@@ -1813,7 +1813,7 @@ if game.PlaceId == 155615604 then
                             charadded:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
                             oldCFrame = charadded:FindFirstChild("HumanoidRootPart").CFrame;
                             loadchar();
-                            repeat task.wait() until charadded:FindFirstChild("HumanoidRootPart");
+                            repeat task.wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart");
                             if (oldCFrame == nil) then return end;
                             charadded:FindFirstChild("HumanoidRootPart").CFrame = oldCFrame;
                             oldCFrame = nil;
