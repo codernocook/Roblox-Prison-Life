@@ -1864,11 +1864,11 @@ if game.PlaceId == 155615604 then
 
     AntiArrest:NewToggle("AntiArrest", "Prevent you from getting arrested", function(state)
         if (state) then
-            repeat task.wait() until plr and plr.Character
+            repeat task.wait() until plr and plr.Character and plr.Character:FindFirstChild("Head")
             local oldCFrame = nil;
 
-            antiArrest_Checker = plr.Character.ChildAdded:Connect(function()
-                if (char:FindFirstChild("handcuffedGui")) then
+            antiArrest_Checker = plr.Character:FindFirstChild("Head").ChildAdded:Connect(function()
+                if (char:FindFirstChild("Head"):FindFirstChild("handcuffedGui")) then
                     if (not Humanoid or not HumanoidRootPart) then return end;
                     char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
                     char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
@@ -1878,14 +1878,14 @@ if game.PlaceId == 155615604 then
             end)
 
             antiArrest_charcheck = plr.CharacterAdded:Connect(function(charadded)
-                repeat task.wait() until charadded:FindFirstChildWhichIsA("Humanoid") and charadded:FindFirstChild("HumanoidRootPart");
+                repeat task.wait() until charadded:FindFirstChildWhichIsA("Humanoid") and charadded:FindFirstChild("HumanoidRootPart") and charadded:FindFirstChild("Head")
                 if (oldCFrame == nil) then return end;
                 plr.Character:FindFirstChild("HumanoidRootPart").CFrame = oldCFrame;
                 oldCFrame = nil;
                 char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
 
-                antiArrest_Checker = plr.Character.ChildAdded:Connect(function()
-                    if (char:FindFirstChild("handcuffedGui")) then
+                antiArrest_Checker = plr.Character:FindFirstChild("Head").ChildAdded:Connect(function()
+                    if (charadded:FindFirstChild("Head"):FindFirstChild("handcuffedGui")) then
                         if (not Humanoid or not HumanoidRootPart) then return end;
                         char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
                         char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
