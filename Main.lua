@@ -1791,6 +1791,7 @@ if game.PlaceId == 155615604 then
             task.spawn(function()
                 if (not Humanoid or not HumanoidRootPart) then return end;
                 local oldCFrame = nil;
+
                 GodModeEnabled = char:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
                     task.spawn(function()
                         char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
@@ -1821,6 +1822,13 @@ if game.PlaceId == 155615604 then
                             charadded:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
                             oldCFrame = charadded:FindFirstChild("HumanoidRootPart").CFrame;
                             loadchar();
+                        end)
+
+                        GodModeHealth = char:FindFirstChildWhichIsA("Humanoid").HealthChanged:Connect(function(healthChanged)
+                            if (healthChanged <= 0) then
+                                char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
+                                char:FindFirstChildWhichIsA("Humanoid"):ChangeState(Enum.HumanoidStateType.Dead);
+                            end
                         end)
                     end)
                 end)
