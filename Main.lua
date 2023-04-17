@@ -56,7 +56,7 @@ if game.PlaceId == 155615604 then
             }
             
             workspace.Remote.TeamEvent:FireServer(unpack(args))
-            repeat task.wait() until char and HumanoidRootPart;
+            repeat task.wait() until char and char:FindFirstChild("Head");
             firetouchinterest(char:FindFirstChild("Head"), game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation"), 0)
             task.wait(.1)
             firetouchinterest(char:FindFirstChild("Head"), game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation"), 1)
