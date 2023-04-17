@@ -1868,7 +1868,7 @@ if game.PlaceId == 155615604 then
             local oldCFrame = nil;
 
             antiArrest_Checker = plr.Character:FindFirstChild("Head").ChildAdded:Connect(function()
-                if (char:FindFirstChild("Head"):FindFirstChild("handcuffedGui")) then
+                if (char:FindFirstChild("Head") and charadded:FindFirstChild("Head"):FindFirstChild("handcuffedGui")) then
                     if (not Humanoid or not HumanoidRootPart) then return end;
                     char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
                     char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
@@ -1885,7 +1885,7 @@ if game.PlaceId == 155615604 then
                 char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
 
                 antiArrest_Checker = plr.Character:FindFirstChild("Head").ChildAdded:Connect(function()
-                    if (charadded:FindFirstChild("Head"):FindFirstChild("handcuffedGui")) then
+                    if (charadded:FindFirstChild("Head") and charadded:FindFirstChild("Head"):FindFirstChild("handcuffedGui")) then
                         if (not Humanoid or not HumanoidRootPart) then return end;
                         char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
                         char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
