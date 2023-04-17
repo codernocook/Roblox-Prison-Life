@@ -1782,29 +1782,55 @@ if game.PlaceId == 155615604 then
 
     local GodMode = ExploitTab:NewSection("GodMode")
     local GodModeEnabled = nil;
+    local GodModeCharCheck = nil;
 
     GodMode:NewToggle("GodMode", "Turn you into god!", function(state)
         if state then
             task.spawn(function()
                 if (not Humanoid or not HumanoidRootPart) then return end;
                 local oldCFrame = nil;
-                char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
-                char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
                 GodModeEnabled = Humanoid.Died:Connect(function()
-                    char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
-                    char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
-                    oldCFrame = HumanoidRootPart.CFrame;
-                    loadchar();
-                    task.wait(.1);
-                    if (oldCFrame == nil) then return end;
-                    HumanoidRootPart.CFrame = oldCFrame;
-                    oldCFrame = nil;
+                    task.spawn(function()
+                        char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
+                        char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
+                        oldCFrame = HumanoidRootPart.CFrame;
+                        loadchar();
+                        repeat task.wait() until HumanoidRootPart;
+                        if (oldCFrame == nil) then return end;
+                        HumanoidRootPart.CFrame = oldCFrame;
+                        oldCFrame = nil;
+                        char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
+                    end)
+                end)
+
+                GodModeCharCheck = plr.CharacterAdded:Connect(function(char)
+                    task.spawn(function()
+                        repeat task.wait() until char:FindFirstChildWhichIsA("Humanoid") and char:FindFirstChild("HumanoidRootPart");
+                        GodModeEnabled = char:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
+                            char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
+                            char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
+                            oldCFrame = char:FindFirstChild("HumanoidRootPart").CFrame;
+                            loadchar();
+                            repeat task.wait() until char:FindFirstChild("HumanoidRootPart");
+                            if (oldCFrame == nil) then return end;
+                            char:FindFirstChild("HumanoidRootPart").CFrame = oldCFrame;
+                            oldCFrame = nil;
+                            char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
+                        end)
+                    end)
                 end)
             end)
         else
             task.spawn(function()
-                GodModeEnabled:Disconnect()
-                GodModeEnabled = nil;
+                if (GodModeEnabled) then
+                    GodModeEnabled:Disconnect()
+                    GodModeEnabled = nil;
+                end
+
+                if (GodModeCharCheck) then
+                    GodModeCharCheck:Disconnect()
+                    GodModeCharCheck = nil;
+                end
                 char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = true;
                 char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
             end)
