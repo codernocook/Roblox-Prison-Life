@@ -1824,10 +1824,10 @@ if game.PlaceId == 155615604 then
                             loadchar();
                         end)
 
-                        GodModeHealth = char:FindFirstChildWhichIsA("Humanoid").HealthChanged:Connect(function(healthChanged)
+                        GodModeHealth = charadded:FindFirstChildWhichIsA("Humanoid").HealthChanged:Connect(function(healthChanged)
                             if (healthChanged <= 0) then
-                                char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
-                                char:FindFirstChildWhichIsA("Humanoid"):ChangeState(Enum.HumanoidStateType.Dead);
+                                charadded:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
+                                charadded:FindFirstChildWhichIsA("Humanoid"):ChangeState(Enum.HumanoidStateType.Dead);
                             end
                         end)
                     end)
