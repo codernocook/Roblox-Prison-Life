@@ -1783,6 +1783,7 @@ if game.PlaceId == 155615604 then
 
     local GodMode = ExploitTab:NewSection("GodMode")
     local GodModeEnabled = nil;
+    local GodModeHealth = nil;
     local GodModeCharCheck = nil;
 
     GodMode:NewToggle("GodMode", "Turn you into god!", function(state)
@@ -1790,13 +1791,20 @@ if game.PlaceId == 155615604 then
             task.spawn(function()
                 if (not Humanoid or not HumanoidRootPart) then return end;
                 local oldCFrame = nil;
-                GodModeEnabled = Humanoid.Died:Connect(function()
+                GodModeEnabled = char:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
                     task.spawn(function()
                         char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
                         char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
                         oldCFrame = HumanoidRootPart.CFrame;
                         loadchar();
                     end)
+                end)
+
+                GodModeHealth = char:FindFirstChildWhichIsA("Humanoid").HealthChanged:Connect(function(healthChanged)
+                    if (healthChanged <= 0) then
+                        char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
+                        char:FindFirstChildWhichIsA("Humanoid"):ChangeState(Enum.HumanoidStateType.Dead);
+                    end
                 end)
 
                 GodModeCharCheck = plr.CharacterAdded:Connect(function(charadded)
@@ -1828,24 +1836,60 @@ if game.PlaceId == 155615604 then
                     GodModeCharCheck:Disconnect()
                     GodModeCharCheck = nil;
                 end
+
+                if (GodModeHealth) then
+                    GodModeHealth:Disconnect()
+                    GodModeHealth = nil;
+                end
+
                 char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = true;
                 char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
             end)
         end
     end)
 
-    Humanoid.Died:Connect(function()
-        if GodMode == true then
-            local godmodoldpos = HumanoidRootPart.CFrame
-            loadchar()
-            task.wait(.1)
-            HumanoidRootPart.CFrame = godmodoldpos
-            HumanoidRootPart.Position = HumanoidRootPart.Position
+    local AntiArrest = ExploitTab:NewSection("AntiArrest");
+    local antiArrest_Checker = nil;
+    local antiArrest_charcheck = nil;
+
+    AntiArrest:NewToggle("AntiArrest", "Prevent you from getting arrested", function(state)
+        if (state) then
+            repeat task.wait() until plr and plr:FindFirstChild("Status") and plr:FindFirstChild("Status"):FindFirstChild("isArrested");
+            local oldCFrame = nil;
+
+            antiArrest_Checker = plr:FindFirstChild("Status"):FindFirstChild("isArrested").Changed:Connect(function()
+                if (plr:FindFirstChild("Status"):FindFirstChild("isArrested") == true) then
+                    if (not Humanoid or not HumanoidRootPart) then return end;
+                    char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
+                    char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
+                    oldCFrame = HumanoidRootPart.CFrame;
+                    loadchar();
+                end
+            end)
+
+            antiArrest_charcheck = plr.CharacterAdded:Connect(function(charadded)
+                repeat task.wait() until charadded:FindFirstChildWhichIsA("Humanoid") and charadded:FindFirstChild("HumanoidRootPart");
+                if (oldCFrame == nil) then return end;
+                plr.Character:FindFirstChild("HumanoidRootPart").CFrame = oldCFrame;
+                oldCFrame = nil;
+                char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
+            end)
+        else
+            if (antiArrest_Checker) then
+                antiArrest_Checker:Disconnect();
+                antiArrest_Checker = nil;
+            end
+
+            if (antiArrest_charcheck) then
+                antiArrest_charcheck:Disconnect();
+                antiArrest_charcheck = nil;
+            end
         end
     end)
 
     local HackerDetector = ExploitTab:NewSection("HackerDetector")
     local HackerDetectorEnabled = false
+
     HackerDetector:NewToggle("Toggle", "Check if someone exploiting or hacking!", function(state)
         if state == true then
             HackerDetectorEnabled = true
