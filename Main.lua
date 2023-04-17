@@ -1862,11 +1862,11 @@ if game.PlaceId == 155615604 then
 
     AntiArrest:NewToggle("AntiArrest", "Prevent you from getting arrested", function(state)
         if (state) then
-            repeat task.wait() until plr and plr:FindFirstChild("Status") and plr:FindFirstChild("Status"):FindFirstChild("isArrested");
+            repeat task.wait() until plr and plr.Character
             local oldCFrame = nil;
 
-            antiArrest_Checker = plr:FindFirstChild("Status"):FindFirstChild("isArrested").Changed:Connect(function()
-                if (plr:FindFirstChild("Status"):FindFirstChild("isArrested") == true) then
+            antiArrest_Checker = plr.Character.ChildAdded:Connect(function(childAdded)
+                if (childAdded and childAdded.Name and childAdded.Name == "handcuffedGui") then
                     if (not Humanoid or not HumanoidRootPart) then return end;
                     char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
                     char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
@@ -1881,6 +1881,16 @@ if game.PlaceId == 155615604 then
                 plr.Character:FindFirstChild("HumanoidRootPart").CFrame = oldCFrame;
                 oldCFrame = nil;
                 char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
+
+                antiArrest_Checker = plr.Character.ChildAdded:Connect(function(childAdded)
+                    if (childAdded and childAdded.Name and childAdded.Name == "handcuffedGui") then
+                        if (not Humanoid or not HumanoidRootPart) then return end;
+                        char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
+                        char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
+                        oldCFrame = HumanoidRootPart.CFrame;
+                        loadchar();
+                    end
+                end)
             end)
         else
             if (antiArrest_Checker) then
