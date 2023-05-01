@@ -1,2221 +1,1070 @@
-if game.PlaceId == 155615604 then
+local Players = game:GetService("Players")
+local plr = Players.LocalPlayer
+repeat task.wait() until plr.Character and getRoot(plr.Character)
+local char = plr.Character or plr.CharacterAdded
+local ResetTeleportEnabled = false
+local FakeLagEnabled = false
+local HeartBeatWalkEnabled = false
+local AlwaysJumpEnabled = false
+local FloatEnabled = false
+local SlowFloatEnabled = false
+local AutoReportEnabled = false
+local BetterGodModeEnabled = false
+local BetterGodModeRespawnCheck = false
+local BetterGodModeConnection = nil
+local ReportConnection = nil
+local HackerDetectorEnabled = false
+local HackerDetectorConnection = nil
+local Humanoid = char:FindFirstChildWhichIsA("Humanoid")
+local Mouse = plr:GetMouse()
+local alreadyreported = {}
+local hackerreported = {}
 
-    if shared.PrisonLifeItzporium then
-        return
-        error("PrisonLife script is running!")
-    else
-        shared.PrisonLifeItzporium = true
+local badwordsreport = {
+    ["gay"] = "Bullying",
+    ["gays"] = "Bullying",
+    ["gae"] = "Bullying",
+    ["gey"] = "Bullying",
+    ["furry"] = "Bullying",
+    ["furries"] = "Bullying",
+    ["furr"] = "Bullying",
+    ["hack"] = "Scamming",
+    ["exploit"] = "Scamming",
+    ["cheat"] = "Scamming",
+    ["dllcheat"] = "Scamming",
+    ["dllexploit"] = "Scamming",
+    ["hecker"] = "Scamming",
+    ["hacer"] = "Scamming",
+    ["fuck"] = "Bullying",
+    ["bitch"] = "Bullying",
+    ["ass"] = "Bullying",
+    ["report"] = "Bullying",
+    ["fat"] = "Bullying",
+    ["black"] = "Bullying",
+    ["getalife"] = "Bullying",
+    ["fatherless"] = "Bullying",
+    ["report"] = "Bullying",
+    ["fatherless"] = "Bullying",
+    ["disco"] = "Offsite Links",
+    ["yt"] = "Offsite Links",
+    ["youtube"] = "Offsite Links",
+    ["dizcourde"] = "Offsite Links",
+    ["retard"] = "Swearing",
+    ["bad"] = "Bullying",
+    ["trash"] = "Bullying",
+    ["nolife"] = "Bullying",
+    ["nolife"] = "Bullying",
+    ["loser"] = "Bullying",
+    ["urmom"] = "Bullying",
+    ["urmum"] = "Bullying",
+    ["killyour"] = "Bullying",
+    ["kys"] = "Bullying",
+    ["hacktowin"] = "Bullying",
+    ["bozo"] = "Bullying",
+    ["kid"] = "Bullying",
+    ["adopted"] = "Bullying",
+    ["linlife"] = "Bullying",
+    ["commitnotalive"] = "Bullying",
+    ["vape"] = "Offsite Links",
+    ["futureclient"] = "Offsite Links",
+    ["infyield"] = "Offsite Links",
+    ["krnl"] = "Offsite Links",
+    ["synnapse"] = "Offsite Links",
+    ["syn"] = "Offsite Links",
+    ["download"] = "Offsite Links",
+    ["youtube"] = "Offsite Links",
+    ["die"] = "Bullying",
+    ["lobby"] = "Bullying",
+    ["ban"] = "Bullying",
+    ["wizard"] = "Bullying",
+    ["wisard"] = "Bullying",
+    ["witch"] = "Bullying",
+    ["magic"] = "Bullying",
+    ["L"] = "Bullying",
+}
+
+function getRoot(charget)
+    local rootPart = charget:FindFirstChild('HumanoidRootPart') or charget:FindFirstChild('Torso') or charget:FindFirstChild('UpperTorso')
+    return rootPart
+end
+
+function getTorso(charget)
+    local rootPart = charget:FindFirstChild('Torso') or charget:FindFirstChild('UpperTorso')
+    return rootPart
+end
+
+local function removerepeat(str)
+    local newstr = ""
+    local lastlet = ""
+    for i,v in pairs(str:split("")) do 
+        if v ~= lastlet then
+            newstr = newstr..v 
+            lastlet = v
+        end
     end
+    return newstr
+end
 
-    local LibraryUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-    local ScriptWindows =  LibraryUI.CreateLib("Prison Life".."", "Sentinel")
+function findreport(msg)
+    local checkstr = removerepeat(msg:gsub("%W+", ""):lower())
+    for i,v in pairs(badwordsreport) do 
+        if checkstr:find(i) then 
+            return v, i
+        end
+    end
+    for i,v in pairs(badwordsreport) do 
+        if checkstr == i then 
+            return v, i
+        end
+    end
+    return nil
+end
 
-    --Tab--
-    local PlayerTab = ScriptWindows:NewTab("Player")
-    local BlatantTab = ScriptWindows:NewTab("Blatant")
-    local GunTab = ScriptWindows:NewTab("Gun")
-    local ServerModerator = ScriptWindows:NewTab("ServerMod")
-    local ExploitTab = ScriptWindows:NewTab("Exploit")
-    -------
+plr:GetMouse().Button1Down:Connect(function()
+    if ResetTeleportEnabled == true then
+        local oldposclick = Mouse.Hit.Position
+        respawn(plr)
+        oldposclick = Mouse.Hit.Position
+        task.wait(Players.RespawnTime + 0.1)
+        local rootget = getRoot(plr.Character)
+        rootget.CFrame = CFrame.new(oldposclick.X, oldposclick.Y, oldposclick.Z)
+        ResetTeleportEnabled = false
+    end
+end)
 
-    --ControlVar--
-    local plr = game:GetService("Players").LocalPlayer
-    local char = plr.Character or plr.CharacterAdded
-    local Humanoid = char:FindFirstChildWhichIsA("Humanoid")
-    local HumanoidRootPart = char:FindFirstChild("HumanoidRootPart")
-    local SpeedNumber = 16
-    local Damage = 20
-    local GunChoose = "Remington 870"
-    local CrashServerMode = false
-    local GunCrashModule = nil
-    local GunCrashChoose = "Remington 870"
-    local Heartbeat = game:GetService("RunService").Heartbeat
-    local Mouse = plr:GetMouse()
-    local PlayerInGame = {}
-    local UserInputService = game:GetService("UserInputService")
-    local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
-    --------------
-    
-
-    game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Home"):FindFirstChild("fadeFrame").Visible = false
-
-    plr.OnTeleport:Connect(function(State)
-        if State == Enum.TeleportState.Started then
-            if queueteleport then
-                queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/codernocook/prisonlife/main/Main.lua'))()")
+local Synnax = {
+    ["PluginName"] = "Synnax",
+    ["PluginDescription"] = "Admin Fe script!",
+    ["Commands"] = {
+        ["ResetBack"] = {
+            ["ListName"] = "ResetBack / reback",
+            ["Description"] = "Reset you and spawn at same position",
+            ["Aliases"] = {"resetback", "reback"},
+            ["Function"] = function(args, speaker)
+                task.spawn(function()
+                    notify("Notification", "Reset your character")
+                    local rootget = getRoot(speaker.Character)
+                    local resetoldpos = rootget.CFrame
+                    execCmd('reset')
+                    task.wait(Players.RespawnTime + 0.1)
+                    rootget.CFrame = resetoldpos
+                end)
             end
-        end
-    end)
-
-    local function loadchar()
-        if (not tostring(plr.TeamColor)) then return end;
-        if (tostring(plr.TeamColor) == "Medium stone grey") then return "fail" end;
-        if (tostring(plr.TeamColor) == "Really red") then
-            local args = {
-                [1] = "Bright orange"
-            }
-            
-            workspace.Remote.TeamEvent:FireServer(unpack(args))
-            repeat task.wait() until char and char:FindFirstChild("Head");
-            task.wait(1)
-            firetouchinterest(char:FindFirstChild("Head"), game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation"), 0)
-            task.wait(.1)
-            firetouchinterest(char:FindFirstChild("Head"), game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation"), 1)
-            return "success";
-        end
-
-        local args = {
-            [1] = tostring(plr.TeamColor)
-        }
-        
-        workspace:FindFirstChild("Remote"):FindFirstChild("TeamEvent"):FireServer(unpack(args))
-        return "success";
-    end
-
-    local function getItem(itemSent)
-        if itemSent == "Remington 870" then
-            if (not plr.Character) then return end;
-            if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
-            local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(821.489197, 94.5960846, 2249.05493);
-            local args = {
-                [1] = workspace:FindFirstChild("Prison_ITEMS"):FindFirstChild("giver"):FindFirstChild("Remington 870"):FindFirstChild("ITEMPICKUP")
-            }
-
-            workspace:FindFirstChild("Remote"):FindFirstChild("ItemHandler"):InvokeServer(unpack(args))
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(821.489197, 94.5960846, 2249.05493);
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
-            task.wait(1);
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
-        elseif itemSent == "M9" then
-            if (not plr.Character) then return end;
-            if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
-            local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(821.489197, 94.5960846, 2249.05493);
-            local args = {
-                [1] = workspace:FindFirstChild("Prison_ITEMS"):FindFirstChild("giver"):FindFirstChild("M9"):FindFirstChild("ITEMPICKUP")
-            }
-
-            workspace:FindFirstChild("Remote"):FindFirstChild("ItemHandler"):InvokeServer(unpack(args))
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(821.489197, 94.5960846, 2249.05493);
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
-            task.wait(1);
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
-        elseif itemSent == "AK-47" then
-            if (not plr.Character) then return end;
-            if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
-            local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(-937.779053, 86.7388382, 2056.79199);
-            local args = {
-                [1] = workspace:FindFirstChild("Prison_ITEMS"):FindFirstChild("giver"):FindFirstChild("AK-47"):FindFirstChild("ITEMPICKUP")
-            }
-
-            workspace:FindFirstChild("Remote"):FindFirstChild("ItemHandler"):InvokeServer(unpack(args))
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(-937.779053, 86.7388382, 2056.79199);
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
-            task.wait(1);
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false;
-        elseif itemSent == "Knife" then
-            if (not plr.Character) then return end;
-            if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
-            local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(707.159729, 89.8002167, 2502.80371);
-            local getKnifeDisabler = false;
-            for _,v in pairs(workspace:FindFirstChild("Prison_ITEMS"):FindFirstChild("single"):GetChildren()) do
-                if (getKnifeDisabler == true) then return end;
-                if (v.Name == "Crude Knife") then
-                    getKnifeDisabler = true;
-                    local args = {
-                        [1] = v["ITEMPICKUP"]
-                    }
-                    workspace.Remote.ItemHandler:InvokeServer(unpack(args))
+        },
+        ["ResetTeleport"] = {
+            ["ListName"] = "resetp / resettp / reback [on/off]",
+            ["Description"] = "Reset you and teleport to the last click position, may bypass some anti cheat",
+            ["Aliases"] = {"resettp", "resetp", "reback"},
+            ["Function"] = function(args, speaker)
+                task.spawn(function()
+                    if args[1] then
+                        if args[1] == "on" then
+                            if ResetTeleportEnabled == true then
+                                notify("Notification", "ResetTeleport already turned on!")
+                            else
+                                ResetTeleportEnabled = true
+                            end
+                        elseif args[1] == "off" then
+                            if ResetTeleportEnabled == false then
+                                notify("Notification", "ResetTeleport already turned off!")
+                            else
+                                ResetTeleportEnabled = false
+                            end
+                        end
+                    else
+                        notify("Notification", "You must set the status for ResetTeleport [on/off]")
+                    end
+                end)
+            end
+        },
+        ["FakeLag"] = {
+            ["ListName"] = "flag / Fakelag",
+            ["Description"] = "Make your movement more laggy",
+            ["Aliases"] = {"flag", "fakelag"},
+            ["Function"] = function(args, speaker)
+               task.spawn(function()
+                    notify("Notification", "Start fake lagging")
+                    FakeLagEnabled = true
+                    speaker.Character.Animate.Disabled = true
+                    if args[1] and tonumber(args[1]) then
+                        repeat task.wait(tonumber(args[1]))
+                            if (not tonumber(args[1])) then
+                                game:GetService("NetworkClient"):SetOutgoingKBPSLimit(-9999)
+                            else
+                                game:GetService("NetworkClient"):SetOutgoingKBPSLimit(0 - args[1])
+                            end
+                            task.wait(5)
+                            game:GetService("NetworkClient"):SetOutgoingKBPSLimit(math.huge())
+                            if FakeLagEnabled == false then
+                                break
+                            end
+                        until FakeLagEnabled == false
+                    else
+                        repeat task.wait(5)
+                            game:GetService("NetworkClient"):SetOutgoingKBPSLimit(-9999)
+                            task.wait(5)
+                            game:GetService("NetworkClient"):SetOutgoingKBPSLimit(math.huge())
+                            if FakeLagEnabled == false then
+                                break
+                            end
+                        until FakeLagEnabled == false
+                    end
+               end)
+            end
+        },
+        ["UnFakeLag"] = {
+            ["ListName"] = "unflag / UnFakelag",
+            ["Description"] = "Turn off fake lag movement",
+            ["Aliases"] = {"unflag", "Unfakelag"},
+            ["Function"] = function(args, speaker)
+                notify("Notification", "Stop fake lagging")
+                FakeLagEnabled = false
+                game:GetService("NetworkClient"):SetOutgoingKBPSLimit(math.huge())
+                speaker.Character.Animate.Disabled = false
+                game:GetService("NetworkClient"):SetOutgoingKBPSLimit(math.huge())
+            end
+        },
+        ["ConsoleSpam"] = {
+            ["ListName"] = "consolespam / spamconsole / spamserverconsole",
+            ["Description"] = "Spam server side console with error",
+            ["Aliases"] = {"consolespam", "spamconsole", "spamserverconsole"},
+            ["Function"] = function(args, speaker)
+                if args[1] then
+                    notify("Notification", "This feature will add later!")
+                else
+                    notify("Notification", "You must write the remote event location")
                 end
             end
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(707.159729, 89.8002167, 2502.80371);
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
-            task.wait(1);
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
-        elseif itemSent == "Hammer" then
-            if (not plr.Character) then return end;
-            if (not plr.Character:FindFirstChild("HumanoidRootPart")) then return end;
-            local backCframe = plr.Character:FindFirstChild("HumanoidRootPart").CFrame;
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(773.345642, 90.5059586, 2522.83643);
-            local args = {
-                [1] = workspace:FindFirstChild("Prison_ITEMS"):FindFirstChild("single"):FindFirstChild("Hammer"):FindFirstChild("ITEMPICKUP")
-            }
-    
-            workspace:FindFirstChild("Remote"):FindFirstChild("ItemHandler"):InvokeServer(unpack(args))
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(773.345642, 90.5059586, 2522.83643);
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = true;
-            task.wait(1);
-            plr.Character:FindFirstChild("HumanoidRootPart").CFrame = backCframe;
-            plr.Character:FindFirstChild("HumanoidRootPart").Anchored = false
-        end
-    end
+        },
+        ["HeartbeatWalk"] = {
+            ["ListName"] = "HeartbeatWalk / hbwalk",
+            ["Description"] = "This type of speed bypass some anticheat",
+            ["Aliases"] = {"heartbeatWalk", "hbwalk"},
+            ["Function"] = function(args, speaker)
+                HeartbeatWalk = true
+                if args[1] then
+                    local tpwalking = true
+                    local Speed = tonumber(args[1])
+                    local HeartBeatDelay = 0.5
+                    local chr = plr.Character
+                    local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
 
-    --PlayerTab
-    local Fly = PlayerTab:NewSection("Fly")
-    Fly:NewToggle("Toggle", "Make you character Fly.", function(state)
-        if state then
-            local uis = game:GetService("UserInputService")
-            local floatName = "Flydude"
-            local Tpwalkspeed = 50
-            local Float = Instance.new("Part", char)
-            Float.Name = floatName
-            Float.Transparency = 1
-            Float.Size = Vector3.new(2,0.2,1.5)
-            Float.Anchored = true
-            local FloatValue = -3.1
-            Float.CFrame = char:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(0, FloatValue, 0)
-            game:GetService("RunService").Heartbeat:Connect(function()
-                Float.CFrame = char:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(0, FloatValue, 0)
-            end)
-                task.spawn(function()
-                        uis.InputBegan:Connect(function(key)
-                            if state == true then
-                                if key.KeyCode == Enum.KeyCode.LeftShift then
-                                    FloatValue -= 0.5
+                    repeat task.wait(HeartBeatDelay)
+                        if hum.MoveDirection.X ~= 0 and hum.MoveDirection.Z ~= 0 then
+                            hum.WalkSpeed = Speed
+                            task.wait(HeartBeatDelay)
+                            repeat
+                                task.wait()
+                                hum.WalkSpeed -= 1
+                                if hum.WalkSpeed == 10 then
+                                    break
                                 end
+                            until hum.WalkSpeed == 10
+                        end
+                        if HeartbeatWalk == false then
+                            break
+                        end
+                    until HeartbeatWalk == false
+                else
+                    local tpwalking = true
+                    local Speed = 50
+                    local HeartBeatDelay = 0.5
+                    local chr = plr.Character
+                    local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+
+                    repeat task.wait(HeartBeatDelay)
+                        if hum.MoveDirection.X ~= 0 and hum.MoveDirection.Z ~= 0 then
+                            hum.WalkSpeed = Speed
+                            task.wait(HeartBeatDelay)
+                            repeat
+                                task.wait()
+                                hum.WalkSpeed -= 1
+                                if hum.WalkSpeed == 10 then
+                                    break
+                                end
+                            until hum.WalkSpeed == 10
+                        end
+                        if HeartbeatWalk == false then
+                            break
+                        end
+                    until HeartbeatWalk == false
+                end
+            end
+        },
+        ["UnHeartbeatWalk"] = {
+            ["ListName"] = "UnheartbeatWalk / unhbwalk",
+            ["Description"] = "Turn off Heartbeat movement",
+            ["Aliases"] = {"unheartbeatwalk", "unhbwalk"},
+            ["Function"] = function(args, speaker)
+                local chr = plr.Character
+                local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+                HeartbeatWalk = false
+                task.wait(.5)
+                hum.WalkSpeed = 16
+            end
+        },
+        ["Teleportclip"] = {
+            ["ListName"] = "Teleportclip / tpclip",
+            ["Description"] = "Change your y level its like minecraft vclip command",
+            ["Aliases"] = {"teleportclip", "tpclip"},
+            ["Function"] = function(args, speaker)
+                task.spawn(function()
+                    if args[1] and speaker and speaker.Character then
+                        local root = getRoot(speaker.Character)
+                        root.CFrame = CFrame.new(root.CFrame.X, root.CFrame.Y + tonumber(args[1]), root.CFrame.Z)
+                    else
+                        notify("Notification", "You must type the y level")
+                    end
+                end)
+            end
+        },
+        ["AlwaysJump"] = {
+            ["ListName"] = "Alwaysjump / repeatjump / rpjump",
+            ["Description"] = "Make you jump when walk",
+            ["Aliases"] = {"alwaysjump", "repeatjump", "rpjump"},
+            ["Function"] = function(args, speaker)
+                AlwaysJumpEnabled = true
+                local chr = plr.Character
+                local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+                repeat task.wait()
+                    if hum.FloorMaterial ~= Enum.Material.Air and hum.MoveDirection.X ~= 0 and hum.MoveDirection.Z ~= 0 then
+                        hum:ChangeState(Enum.HumanoidStateType.Jumping)
+                    end
+                    if AlwaysJumpEnabled == false then
+                        break
+                    end
+                until AlwaysJumpEnabled == false
+            end
+        },
+        ["UnAlwaysJump"] = {
+            ["ListName"] = "UnAlwaysjump / unrepeatjump / unrpjump",
+            ["Description"] = "Turn off AlwaysJump",
+            ["Aliases"] = {"unalwaysJump", "unrepeatjump", "unrpjump"},
+            ["Function"] = function(args, speaker)
+                AlwaysJumpEnabled = false
+            end
+        },
+        ["Timer"] = {
+            ["ListName"] = "Timer [TimerSpeed] ",
+            ["Description"] = "It like minecraft timer, really fast!",
+            ["Aliases"] = {"timer", "timeSpeed"},
+            ["Function"] = function(args, speaker)
+                local chr = plr.Character
+                local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+                if args[1] and not tonumber(args[1]) == 0 then
+                    game:GetService("Workspace").Gravity = tonumber(args[1]) * 100
+                    hum.WalkSpeed = tonumber(args[1]) * 10
+                else
+                    if tonumber(args[1]) == 0 then
+                        game:GetService("Workspace").Gravity = 196.2
+                        hum.WalkSpeed = 16
+                    else
+                        game:GetService("Workspace").Gravity = 500
+                        hum.WalkSpeed = 50
+                    end
+                end
+            end
+        },
+        ["Betterfling"] = {
+            ["ListName"] = "BetterFling / ffling [plr]",
+            ["Description"] = "Fling player you want to!",
+            ["Aliases"] = {"BetterFling", "FastFling", "betterfling", "fastfling", "ffling"},
+            ["Function"] = function(args, speaker)
+                local flinging = false
+                function Fling(playerfling)
+                    for flingcheck, playerflingcheck in pairs(playerfling) do
+                        local flingplrcheck = nil
+                        if Players:FindFirstChild(playerflingcheck) then
+                            flingplrcheck = Players:FindFirstChild(playerflingcheck)
+                        else
+                            flingplrcheck = nil
+                        end
+                        if flingplrcheck.Character and speaker.Character then
+                            task.spawn(function()
+                                if flingplrcheck.Character:FindFirstChildWhichIsA("Humanoid").Sit == true then
+                                    notify("Notification", "Can't fling Player in sitting state!")
+                                    return
+                                elseif getRoot(flingplrcheck.Character).Anchored == true then
+                                    notify("Notification", "Can't fling Player is anchored!")
+                                    return
+                                elseif getTorso(flingplrcheck.Character).CanCollide == false and flingplrcheck.Character:FindFirstChild("Head").CanCollide == false then
+                                    notify("Notification", "Can't fling Player has CanCollide off!")
+                                    return
+                                elseif not getRoot(speaker.Character) then
+                                    notify("Notification", "Can't get your Character RootPart!")
+                                    return
+                                end
+                                for _, child in pairs(speaker.Character:GetDescendants()) do
+                                    if child:IsA("BasePart") then
+                                        child.CustomPhysicalProperties = PhysicalProperties.new(math.huge, math.huge, math.huge)
+                                    end
+                                end
+                                execCmd('noclip')
+                                local OldCFrameBeforeRun = getRoot(speaker.Character).CFrame
+                                task.wait(.1)
+                                local bambam = Instance.new("BodyAngularVelocity")
+                                local bambam1 = Instance.new("BodyThrust")
+                                local RunLoopTeleport = false
+                                bambam.Name = randomString()
+                                bambam.Parent = getRoot(speaker.Character)
+                                bambam.AngularVelocity = Vector3.new(999999999,999999999,999999999)
+                                bambam.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
+                                bambam.P = math.huge
+                                bambam1.Parent = getRoot(speaker.Character)
+                                bambam1.Force = Vector3.new(999999999, 999999999, 999999999)
+                                bambam1.Location = getRoot(speaker.Character).Position
+                                bambam1.Name = randomString()
+                                local Char = speaker.Character:GetChildren()
+                                for i, v in next, Char do
+                                    if v:IsA("BasePart") then
+                                        v.CanCollide = false
+                                        v.Massless = true
+                                        v.Velocity = Vector3.new(0, 0, 0)
+                                    end
+                                end
+                                local flingDied = nil
+                                flinging = true
+                                local function flingDiedF()
+                                    execCmd('unfling')
+                                end
+                                flingDied = Humanoid.Died:Connect(flingDiedF)
+    
+                                local flingloopteleport = game:GetService("RunService").Heartbeat:Connect(function()
+                                    pcall(function()
+                                        if RunLoopTeleport == true and flingplrcheck and flingplrcheck.Character then
+                                            if bambam1 then
+                                                bambam1.Location = getRoot(speaker.Character).Position
+                                            end
+                                            local flingplrcframe = getRoot(flingplrcheck.Character).CFrame
+                                            getRoot(speaker.Character).CFrame = CFrame.new(flingplrcframe.X, flingplrcframe.Y + 1, flingplrcframe.Z)
+                                            getRoot(speaker.Character).CFrame = CFrame.new(flingplrcframe.X, flingplrcframe.Y + 1, flingplrcframe.Z)
+                                            task.wait(.05)
+                                            getRoot(speaker.Character).CFrame = CFrame.new(flingplrcframe.X + 0.5, flingplrcframe.Y + 1.5, flingplrcframe.Z + 0.5) 
+                                            task.wait(.05)
+                                            getRoot(speaker.Character).CFrame = CFrame.new(flingplrcframe.X - 0.5, flingplrcframe.Y - 1.5, flingplrcframe.Z - 0.5)
+                                            task.wait(.05)
+                                            getRoot(speaker.Character).CFrame = CFrame.new(flingplrcframe.X + 0.5, flingplrcframe.Y + 1.5, flingplrcframe.Z + 0.5)
+                                            task.wait(.05)
+                                            getRoot(speaker.Character).CFrame = CFrame.new(flingplrcframe.X - 0.5, flingplrcframe.Y - 1.5, flingplrcframe.Z - 0.5)
+                                            task.wait(.05)
+                                            getRoot(speaker.Character).CFrame = CFrame.new(flingplrcframe.X + 0.5, flingplrcframe.Y + 1.5, flingplrcframe.Z + 0.5)
+                                            task.wait(.05)
+                                            getRoot(speaker.Character).CFrame = CFrame.new(flingplrcframe.X - 0.5, flingplrcframe.Y - 1.5, flingplrcframe.Z - 0.5)
+                                            task.wait(.05)
+                                            getRoot(speaker.Character).CFrame = CFrame.new(flingplrcframe.X + 0.5, flingplrcframe.Y + 1.5, flingplrcframe.Z + 0.5)
+                                            task.wait(.05)
+                                            getRoot(speaker.Character).CFrame = CFrame.new(flingplrcframe.X + 0.5, flingplrcframe.Y - 1.5, flingplrcframe.Z + 0.5)
+                                            task.wait(.05)
+                                            getRoot(speaker.Character).CFrame = CFrame.new(flingplrcframe.X, flingplrcframe.Y - 1, flingplrcframe.Z)
+                                            getRoot(speaker.Character).CFrame = CFrame.new(flingplrcframe.X, flingplrcframe.Y - 1, flingplrcframe.Z)
+                                            getRoot(speaker.Character).CFrame = flingplrcframe.CFrame * flingplrcframe.Velocity/4.3
+                                        end
+                                    end)
+                                end)
+
+                                for flinglooprun = 1, 5 do
+                                    if not speaker.Character or not getRoot(speaker.Character) then return end
+                                    RunLoopTeleport = true
+                                    bambam.AngularVelocity = Vector3.new(999999999,999999999,999999999)
+                                    bambam1.Force = Vector3.new(999999999, 999999999, 999999999)
+                                    if not speaker.Character or not getRoot(speaker.Character) then return end
+                                    bambam1.Location = getRoot(speaker.Character).Position
+                                    task.wait(.3)
+                                    bambam.AngularVelocity = Vector3.new(0,0,0)
+                                    bambam1.Force = Vector3.new(0,0,0)
+                                    if not speaker.Character or not getRoot(speaker.Character) then return end
+                                    bambam1.Location = getRoot(speaker.Character).Position
+                                    task.wait(.1)
+                                end
+    
+                                if bambam then
+                                    bambam:Destroy()
+                                end
+                                if bambam1 then
+                                    bambam1:Destroy()
+                                end
+                                if flingDied then
+                                    flingDied:Disconnect()
+                                end
+                                flinging = false
+                                RunLoopTeleport = false
+                                flingloopteleport:Disconnect()
+                                task.wait(.1)
+                                local speakerChar = speaker.Character
+                                if not speakerChar or not getRoot(speakerChar) then return end
+                                for i,v in pairs(getRoot(speakerChar):GetChildren()) do
+                                    if v.ClassName == 'BodyAngularVelocity' or v.ClassName == 'BodyThrust' then
+                                        v:Destroy()
+                                    end
+                                end
+                                for _, child in pairs(speakerChar:GetDescendants()) do
+                                    if child.ClassName == "Part" or child.ClassName == "MeshPart" then
+                                        child.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.3, 0.5)
+                                    end
+                                end
+                                task.wait(.1)
+                                if getRoot(speaker.Character) then
+                                    RunLoopTeleport = false
+                                    flingloopteleport:Disconnect()
+                                    if bambam then
+                                        bambam:Destroy()
+                                    end
+                                    if bambam1 then
+                                        bambam1:Destroy()
+                                    end
+                                    local antiflingout = Instance.new("BodyVelocity")
+                                    antiflingout.Parent = getRoot(speaker.Character)
+                                    antiflingout.Name = randomString()
+                                    antiflingout.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+                                    antiflingout.Velocity = Vector3.new(0, -100, 0)
+                                    getRoot(speaker.Character).Anchored = true
+                                    getRoot(speaker.Character).CFrame = OldCFrameBeforeRun
+                                    task.wait(.5)
+                                    execCmd('unnoclip')
+                                    getRoot(speaker.Character).Anchored = false
+                                    getRoot(speaker.Character).CFrame = OldCFrameBeforeRun
+                                    task.wait(.6)
+                                    antiflingout.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+                                    if antiflingout then
+                                        antiflingout:Destroy()
+                                    end
+                                    getRoot(speaker.Character).CFrame = OldCFrameBeforeRun
+                                end
+                            end)
+                        else
+                            if flingplrcheck.Character:FindFirstChildWhichIsA("Humanoid").Sit == true then
+                                notify("Notification", "Can't fling Player in sitting state!")
+                            elseif getRoot(flingplrcheck.Character).Anchored == true then
+                                notify("Notification", "Can't fling Player is anchored!")
+                            elseif getTorso(flingplrcheck.Character).CanCollide == false and flingplrcheck.Character:FindFirstChild("Head").CanCollide == false then
+                                notify("Notification", "Can't fling Player has CanCollide off!")
+                            elseif not getRoot(speaker.Character) then
+                                notify("Notification", "Can't get your Character RootPart!")
+                            end
+                        end
+                    end
+                end
+                if args[1] then
+                    if tostring(args[1]):lower() == "all" then
+                        for allplrscount, allsplrget in pairs(Players:GetChildren()) do
+                            Fling(allsplrget.Name)
+                        end
+                    else
+                        if BetterFlingEnabled == true then
+                            notify("Notification", "Is Flinging another player")
+                        else
+                            if getPlayer(args[1], speaker) and getPlayer(args[1], speaker) ~= "" then
+                                for something, plrintestget in pairs(getPlayer(args[1], speaker)) do
+                                    if plrintestget == speaker.Name then
+                                        local bambam = Instance.new("BodyAngularVelocity")
+                                        bambam.AngularVelocity = Vector3.new(9999999,9999999,9999999)
+                                        bambam.MaxTorque = Vector3.new(math.huge,math.huge,math.huge)
+                                        bambam.P = math.huge
+                                        bambam1.Parent = getRoot(speaker.Character)
+                                    else
+                                        Fling(getPlayer(args[1], speaker))
+                                    end
+                                end
+                            end
+                        end
+                    end
+                else
+                    notify("Notification", "Invalid player")
+                end
+            end
+        },
+        ["BetterInvisiblefling"] = {
+            ["ListName"] = "BetterInvisibleFling / BetterInvisFling [plr]",
+            ["Description"] = "Fling player you want but it will be invisible!",
+            ["Aliases"] = {"BetterInvisibleFling", "FastInvisibleFling", "betterinvisfling", "betterinvisiblefling", "fastinvisiblefling", "fastinvisfling", "fvfling"},
+            ["Function"] = function(args, speaker)
+                if args[1] then
+                    local ch = speaker.Character
+                    local prt=Instance.new("Model")
+                    prt.Parent = speaker.Character
+                    local z1 = Instance.new("Part")
+                    z1.Name="Torso"
+                    z1.CanCollide = false
+                    z1.Anchored = true
+                    local z2 = Instance.new("Part")
+                    z2.Name="Head"
+                    z2.Parent = prt
+                    z2.Anchored = true
+                    z2.CanCollide = false
+                    local z3 =Instance.new("Humanoid")
+                    z3.Name="Humanoid"
+                    z3.Parent = prt
+                    z1.Position = Vector3.new(0,9999,0)
+                    speaker.Character=prt
+                    task.wait(.1)
+                    speaker.Character=ch
+                    task.wait(.1)
+                    local Hum = Instance.new("Humanoid")
+                    z2:Clone()
+                    Hum.Parent = speaker.Character
+                    local root =  getRoot(speaker.Character)
+                    for i,v in pairs(speaker.Character:GetChildren()) do
+                        if v ~= root and  v.Name ~= "Humanoid" then
+                            v:Destroy()
+                        end
+                    end
+                    root.Transparency = 0
+                    root.Color = Color3.new(1, 1, 1)
+                    local invisflingStepped
+                    invisflingStepped = RunService.Stepped:Connect(function()
+                        if speaker.Character and getRoot(speaker.Character) then
+                            getRoot(speaker.Character).CanCollide = false
+                            execCmd('loopgoto ' .. tostring(args[1]) .. " 0 0.5")
+                            task.wait(.01)
+                            execCmd('unloopgoto')
+                        else
+                            invisflingStepped:Disconnect()
+                        end
+                    end)
+                    execCmd('fly')
+                    execCmd('noclip')
+                    workspace.CurrentCamera.CameraSubject = root
+                    local bambam = Instance.new("BodyThrust")
+                    bambam.Parent = getRoot(speaker.Character)
+                    bambam.Force = Vector3.new(99999,99999*10,99999)
+                    bambam.Location = getRoot(speaker.Character).Position
+                    task.wait(.1)
+                    task.wait(2)
+                    respawn(speaker)
+                end
+            end
+        },
+        ["ForceGiveTool"] = {
+            ["ListName"] = "ForceGiveTool / fgivetool / bettergive / bgive",
+            ["Description"] = "Remove your humanoid to forcegivetool player",
+            ["Aliases"] = {"forcegiveTool", "fgivetool"},
+            ["Function"] = function(args, speaker)
+                if speaker and speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid") and args[1] and args[2] then
+                    local GetGiveToolPlayer = getPlayer(tostring(args[1]))
+                    local ToolGive = tostring(args[2])
+
+                    if (GetGiveToolPlayer == nil) then return notify("Notification", "Please type a valid player.") end;
+                    if (ToolGive == nil) then return notify("Notification", "Please type a valid tool and make sure the tool have handle.") end;
+
+                    if (char:FindFirstChildWhichIsA("Humanoid")) then
+                        if (not char) then return notify("Notification", "Character not found") end;
+                        if (char:FindFirstChild(ToolGive) and plr.Backpack:FindFirstChild(ToolGive)) then return notify("Notification", "Tool given not found / not exist") end;
+
+                        if (plr.Backpack:FindFirstChild(ToolGive)) then
+                            if (not char) then return notify("Notification", "Character not found") end;
+                            plr.Backpack:FindFirstChild(ToolGive).Parent = char;
+                        end
+
+                        char:FindFirstChildWhichIsA("Humanoid"):Destroy();
+
+                            if (GetGiveToolPlayer == nil) then return notify("Notification", "Please type a valid player.") end;
+
+                            if (GetGiveToolPlayer.Character) then
+                                local givenChar = GetGiveToolPlayer.Character;
+
+                                if (givenChar:FindFirstChild("HumanoidRootPart")) then
+                                    if (char:FindFirstChild("HumanoidRootPart")) then
+                                        local oldCframe = char:FindFirstChild("HumanoidRootPart").CFrame;
+
+                                        local loopHeartbeat = game:GetService("RunService").Heartbeat:Connect(function()
+                                            char:FindFirstChild("HumanoidRootPart").CFrame = givenChar:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(0, 0, -.5);
+                                        end)
+
+                                        task.wait(2)
+                                        
+                                        loopHeartbeat:Disconnect();
+                                        loopHeartbeat = nil;
+
+                                        repeat task.wait() until not char;
+                                        char = plr.Character or plr.CharacterAdded;
+
+                                        if (char:FindFirstChild("HumanoidRootPart")) then
+                                            char:FindFirstChild("HumanoidRootPart").CFrame = oldCframe;
+                                        end
+                                    else
+                                        notify("Notification", "You must have a HumanoidRootPart to give player tool")
+                                    end
+                                else
+                                    notify("Notification", "HumanoidRootPart of the given player is not exist");
+                                end
+                            else
+                                return notify("Notification", "The player given doesn't have a valid character");
+                            end
+                    else
+                        return notify("Notification", "No humanoid found in your character")
+                    end
+                end
+            end
+        },
+        ["BetterFloat"] = {
+            ["ListName"] = "BetterFloat / BFloat [speed]",
+            ["Description"] = "Fix Infinite yield Float",
+            ["Aliases"] = {"betterfloat", "bfloat"},
+            ["Function"] = function(args, speaker)
+                FloatEnabled = true
+                if args[1] then
+                    execCmd('tpwalk ' .. tostring((tonumber(args[1]) / 100)))
+                end
+                local uis = game:GetService("UserInputService")
+                local Tpwalkspeed = 50
+                local Float = Instance.new("Part", speaker.Character)
+                    Float.Name = randomString()
+                    Float.Transparency = 1
+                    Float.Size = Vector3.new(2,0.2,1.5)
+                    Float.Anchored = true
+                    local FloatValue = -3.1
+                    Float.CFrame = getRoot(speaker.Character).CFrame * CFrame.new(0, FloatValue, 0)
+                    game:GetService("RunService").Heartbeat:Connect(function()
+                        Float.CFrame = getRoot(speaker.Character).CFrame * CFrame.new(0, FloatValue, 0)
+                        if FloatEnabled == false then
+                            Float:Destroy()
+                        end
+                    end)
+                task.spawn(function()
+                    uis.InputBegan:Connect(function(key)
+                        if key.KeyCode == Enum.KeyCode.LeftShift then
+                            FloatValue -= 0.5
+                        end
+                    end)
+
+                    uis.InputEnded:Connect(function(key)
+                        if key.KeyCode == Enum.KeyCode.LeftShift then
+                            FloatValue += 0.5
+                        end
+                    end)
+                end)
+            end
+        },
+        ["UnBetterFloat"] = {
+            ["ListName"] = "UnbetterFloat / UnBFloat",
+            ["Description"] = "Fix Infinite yield Float",
+            ["Aliases"] = {"unbetterfloat", "unbfloat"},
+            ["Function"] = function(args, speaker)
+                FloatEnabled = false
+            end
+        },
+        ["SlowFloat"] = {
+            ["ListName"] = "SlowFloat / FreezeFloat / SFloat",
+            ["Description"] = "Make you walk in air but slow so it will bypass anticheat",
+            ["Aliases"] = {"slowfloat", "freezefloat", "sfloat"},
+            ["Function"] = function(args, speaker)
+                if args[1] and tonumber(args[1]) ~= nil then
+                    SlowFloatEnabled = true
+                    local uis = game:GetService("UserInputService")
+                    local floatName = "Float"
+                    local Tpwalkspeed = 50
+                    local Float = Instance.new("Part", speaker.Character)
+                        Float.Name = floatName
+                        Float.Transparency = 1
+                        Float.Size = Vector3.new(2,0.2,1.5)
+                        Float.Anchored = true
+                        local FloatValue = -3.1
+                        Float.CFrame = getRoot(speaker.Character).CFrame * CFrame.new(0, FloatValue, 0)
+                        execCmd('HeartbeatWalk ' .. tonumber(args[1]))
+                        game:GetService("RunService").Heartbeat:Connect(function()
+                            Float.CFrame = getRoot(speaker.Character).CFrame * CFrame.new(0, FloatValue, 0)
+                            if SlowFloatEnabled == false then
+                                Float:Destroy()
+                            end
+                        end)
+                    task.spawn(function()
+                        uis.InputBegan:Connect(function(key)
+                            if key.KeyCode == Enum.KeyCode.LeftShift then
+                                FloatValue -= 0.5
                             end
                         end)
 
                         uis.InputEnded:Connect(function(key)
-                            if state == true then
-                                if key.KeyCode == Enum.KeyCode.LeftShift then
-                                    FloatValue += 0.5
-                                end
-                            end
-                        end)
-                end)
-            else
-            if char:FindFirstChild("Flydude") then
-                char:FindFirstChild("Flydude"):Destroy()
-            end
-        end
-    end)
-    --
-    local Speed = PlayerTab:NewSection("Speed")
-    local SpeedEnabled = false
-    local SpeedJumpPower = 10
-
-     Speed:NewToggle("Toggle", "Improve your movement.", function(state)
-        if state then
-            task.spawn(function()
-                SpeedEnabled = true
-            end)
-        else
-            task.spawn(function()
-                SpeedEnabled = false
-                Humanoid.JumpPower = 50
-            end)
-        end
-    end)
-
-    local AlwaysJumpCheck = false
-
-    Speed:NewToggle("AlwaysJump", "Jump when you move.", function(state)
-        if state then
-            AlwaysJumpCheck = state
-        else
-            AlwaysJumpCheck = state
-        end
-    end)
-
-    Speed:NewSlider("Speed", "", 500, 16, function(speedcallback)
-        task.spawn(function()
-            SpeedNumber = tonumber(speedcallback)
-        end)
-    end)
-
-    Speed:NewSlider("JumpPower", "", 50, 10, function(jumppowercallback)
-        task.spawn(function()
-            SpeedJumpPower = tonumber(jumppowercallback)
-        end)
-    end)
-
-    local JumpPower = PlayerTab:NewSection("JumpPower")
-    local JumpPowerRecord = 50
-
-    JumpPower:NewToggle("Toggle", "Make you jump higher.", function(state)
-        if state then
-            task.spawn(function()
-                Humanoid.JumpPower = tonumber(JumpPowerRecord)
-            end)
-        else
-            task.spawn(function()
-                Humanoid.JumpPower = 50
-            end)
-        end
-    end)
-
-    JumpPower:NewSlider("JumpPower", "", 500, 50, function(jumppowerrecordcallback)
-        task.spawn(function()
-            JumpPowerRecord = tonumber(jumppowerrecordcallback)
-        end)
-    end)
-
-    local BugsFix = PlayerTab:NewSection("BugsFix")
-
-    BugsFix:NewButton("FixBackpack", "Fix backpack not appear", function()
-        task.spawn(function()
-            game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, true)
-        end)
-    end)
-
-    local Character = PlayerTab:NewSection("Character")
-    Character:NewButton("LoadCharacter", "Make your character respawn server side type", function()
-        task.spawn(function()
-            loadchar()
-        end)
-    end)
-    Character:NewButton("RemoveCharacter", "Remove your Character", function()
-       task.spawn(function()
-        loadchar()
-       end)
-    end)
-
-    local Team = PlayerTab:NewSection("Team")
-    Team:NewButton("Guards", "Change your team to Guards", function()
-        task.spawn(function()
-            local oldCFrame = HumanoidRootPart.CFrame or "undefined";
-            local args = {
-                [1] = "Bright blue"
-            }
-            
-            workspace.Remote.TeamEvent:FireServer(unpack(args))
-            repeat task.wait() until char and HumanoidRootPart;
-            if (not oldCFrame == "undefined") then
-                HumanoidRootPart.CFrame = oldCFrame;
-            end;
-        end)
-    end)
-
-    Team:NewButton("Inmates", "Change your team to Inmates", function()
-        task.spawn(function()
-            local oldCFrame = HumanoidRootPart.CFrame or "undefined";
-            local args = {
-                [1] = "Bright orange"
-            }
-            
-            workspace.Remote.TeamEvent:FireServer(unpack(args))
-            repeat task.wait() until char and HumanoidRootPart;
-            if (not oldCFrame == "undefined") then
-                HumanoidRootPart.CFrame = oldCFrame;
-            end;
-        end)
-    end)
-
-    Team:NewButton("Neutral", "Change your team to Neutral", function()
-        task.spawn(function()
-            local args = {
-                [1] = "Medium stone grey"
-            }
-            
-            workspace.Remote.TeamEvent:FireServer(unpack(args))
-        end)
-    end)
-
-    Team:NewButton("Criminals", "Change your team to Criminals", function()
-        task.spawn(function()
-            if plr.Team == "Guards" or plr.Team == "Neutral" or plr.Team == "Criminals" or plr.Team == nil or plr.Team == "" then
-                local oldCFrame = HumanoidRootPart.CFrame or "undefined";
-                local args = {
-                    [1] = "Bright orange"
-                }
-                
-                workspace.Remote.TeamEvent:FireServer(unpack(args))
-                repeat task.wait() until char and HumanoidRootPart;
-                if (not oldCFrame == "undefined") then
-                    HumanoidRootPart.CFrame = oldCFrame;
-                end;
-                firetouchinterest(char:FindFirstChild("Head"), game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation"), 0)
-                task.wait(.1)
-                firetouchinterest(char:FindFirstChild("Head"), game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation"), 1)
-            else
-                firetouchinterest(char:FindFirstChild("Head"), game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation"), 0)
-                task.wait(.1)
-                firetouchinterest(char:FindFirstChild("Head"), game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation"), 1)
-            end
-        end)
-    end)
-
-    Team:NewButton("Black Team", "Turn you into black team so everyone thing you are hacker lol", function()
-        task.spawn(function()
-            local oldpos = char:FindFirstChild("HumanoidRootPart").CFrame
-            task.wait(.1)
-            loadchar()
-            task.wait(.1)
-            char:FindFirstChild("HumanoidRootPart").CFrame = oldpos
-        end)
-    end)
-    ----------
-
-    --BlatantTab--
-        local GiveItem = BlatantTab:NewSection("Give Item")
-        local GiveItemChoosen = nil
-
-        GiveItem:NewDropdown("Item", "Choose Item you want to get", {"Remington 870", "M9", "AK-47", "Crude Knife", "Hammer"}, function(toolselect)
-            task.spawn(function()
-                GiveItemChoosen = tostring(toolselect)
-            end)
-        end)
-
-        GiveItem:NewButton("Get Item", "Get Item you want", function()
-            local function GetItem(Location)
-                local gunpickup = {
-                    [1] = Location
-                }
-        
-                workspace.Remote.ItemHandler:InvokeServer(unpack(gunpickup))
-           end
-            
-            if GiveItemChoosen == "Remington 870" then
-                GetItem(workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP)
-            elseif GiveItemChoosen == "M9" then
-                GetItem(workspace.Prison_ITEMS.giver:FindFirstChild("M9").ITEMPICKUP)
-            elseif GiveItemChoosen == "AK-47" then
-                GetItem(workspace.Prison_ITEMS.giver:FindFirstChild("AK-47").ITEMPICKUP)
-            elseif GiveItemChoosen  == "Crude Knife" then
-                GetItem(workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP)
-            elseif GiveItemChoosen == "Hammer" then
-                GetItem(workspace.Prison_ITEMS.single:FindFirstChild("Hammer").ITEMPICKUP)
-            end
-        end)
-        
-        GiveItem:NewButton("Give All Item", "Get all of Item in Prison Life i don't think it will work", function()
-            task.spawn(function()
-                for i, v in pairs(game:GetService("Workspace"):FindFirstChild("Prison_ITEMS"):FindFirstChild("single"):GetChildren()) do
-                    local args = {
-                        [1] = v:FindFirstChild("ITEMPICKUP")
-                    }
-                    
-                    workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-                end
-                for i, v in pairs(workspace.Prison_ITEMS.giver:GetChildren()) do
-                local args = {
-                    [1] = v:FindFirstChild("ITEMPICKUP")
-                }
-                
-                workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-                end
-            end)
-        end)
-
-        local KillAura = BlatantTab:NewSection("Kill Aura")
-        local KillAuraToggle = false
-
-        KillAura:NewToggle("Toggle", "Punch someone near you", function(state)
-            if state then
-                task.spawn(function()
-                    KillAuraToggle = state
-                end)
-            else
-                task.spawn(function()
-                    KillAuraToggle = state
-                end)
-            end
-        end)
-
-        local DeathClick = BlatantTab:NewSection("DeathClick")
-        local DeathClickToggle = false
-        DeathClick:NewToggle("Toggle", "Click someone they will die", function(state)
-            if state then
-                DeathClickToggle = true
-            else
-                DeathClickToggle = false
-            end
-        end)
-
-        Mouse.Button1Down:Connect(function(hit)
-            if DeathClickToggle == true and Mouse.Target.Parent:FindFirstChildWhichIsA("Humanoid") then
-                local charclicked = Mouse.Target.Parent
-                local plrclicked = game:GetService("Players"):GetPlayerFromCharacter(charclicked)
-                if plrclicked ~= plr then
-                    for i = 1, 50 do
-                        if (0 - (plrclicked.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude)) < 20 then
-                            local args = {
-                                [1] = plrclicked
-                            }
-            
-                            game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
-                        else
-                            local PunchOldPos = HumanoidRootPart.CFrame
-                            HumanoidRootPart.CFrame = plrclicked.Character:FindFirstChild("HumanoidRootPart").CFrame or plrclicked.Character:FindFirstChild("Torso").CFrame
-                            task.wait(.1)
-                            local args = {
-                                [1] = plrclicked
-                            }
-            
-                            game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
-                            task.wait(.1)
-                            HumanoidRootPart.CFrame = PunchOldPos
-                        end
-                    end
-                end
-            end
-         end)
-
-        local DeadPunch = BlatantTab:NewSection("DeadPunch")
-        local DeadPunchEnabled = false
-
-        DeadPunch:NewToggle("Toggle", "its like superpunch", function(state)
-            local PunchPart
-            if state then
-                task.spawn(function()
-                    DeadPunchEnabled = true
-                    local Root = HumanoidRootPart or char:FindFirstChild("Torso")
-                    if HumanoidRootPart or char.Character:FindFirstChild("Torso") then
-                        PunchPart = Instance.new("Part", Root)
-                        PunchPart.Name = "PunchPart"
-                        PunchPart.Size = Vector3.new(3.5, 5, 3.5)
-                        PunchPart.CanCollide = false
-                        PunchPart.Anchored = true
-                        PunchPart.Transparency = 1
-                    end
-                    UserInputService.InputBegan:Connect(function(key)
-                        PunchPart.Touched:Connect(function(hit)
-                            if key.KeyCode == Enum.KeyCode.F and DeadPunchEnabled == true then
-                                local plrhit = game:GetService("Players"):GetPlayerFromCharacter(hit.Parent)
-                                if DeadPunchEnabled == true and Root and not plrhit == plr then
-                                    for Punchloop = 1, 15 do
-                                        local args = {
-                                            [1] = plrhit
-                                        }
-                        
-                                        game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
-                                    end
-                                end
+                            if key.KeyCode == Enum.KeyCode.LeftShift then
+                                FloatValue += 0.5
                             end
                         end)
                     end)
-                    repeat task.wait(.01)
-                        PunchPart.CFrame = HumanoidRootPart.CFrame
-                        if DeadPunchEnabled == false then
-                            break
+                else
+                    SlowFloatEnabled = true
+                    local uis = game:GetService("UserInputService")
+                    local floatName = "Float"
+                    local Tpwalkspeed = 50
+                    local Float = Instance.new("Part", speaker.Character)
+                        Float.Name = floatName
+                        Float.Transparency = 1
+                        Float.Size = Vector3.new(2,0.2,1.5)
+                        Float.Anchored = true
+                        local FloatValue = -3.1
+                        Float.CFrame = getRoot(speaker.Character).CFrame * CFrame.new(0, FloatValue, 0)
+                        execCmd('HeartbeatWalk 50')
+                        game:GetService("RunService").Heartbeat:Connect(function()
+                            Float.CFrame = getRoot(speaker.Character).CFrame * CFrame.new(0, FloatValue, 0)
+                            if SlowFloatEnabled == false then
+                                Float:Destroy()
+                            end
+                        end)
+                    task.spawn(function()
+                        uis.InputBegan:Connect(function(key)
+                            if key.KeyCode == Enum.KeyCode.LeftShift then
+                                FloatValue -= 0.5
+                            end
+                        end)
+
+                        uis.InputEnded:Connect(function(key)
+                            if key.KeyCode == Enum.KeyCode.LeftShift then
+                                FloatValue += 0.5
+                            end
+                        end)
+                    end)
+                end
+            end
+        },
+        ["UnSlowFloat"] = {
+            ["ListName"] = "UnSlowFloat / UnFreezeFloat / UnSFloat",
+            ["Description"] = "Make you float slowly bypass some anti cheat",
+            ["Aliases"] = {"unslowFloat", "unfreezeFloat", "unsfloat"},
+            ["Function"] = function(args, speaker)
+                SlowFloatEnabled = false
+                execCmd('unheartbeatwalk')
+            end
+        },
+        ["AutoReport"] = {
+            ["ListName"] = "AutoReport / Autorep",
+            ["Description"] = "Report someone say bad words",
+            ["Aliases"] = {"AutoReport", "Autorep", "autoreport", "autorep"},
+            ["Function"] = function(args, speaker)
+                
+                if AutoReportEnabled == false then
+                    AutoReportEnabled = true
+                    notify("Notification", "Autoreport turned on!")
+                    ReportConnection = game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents"):FindFirstChild("OnMessageDoneFiltering").OnClientEvent:Connect(function(tab, channel)
+                        local plrreportget = Players:FindFirstChild(tab["FromSpeaker"])
+                        local args = tab.Message:split(" ")
+                        if AutoReportEnabled == true and plrreportget and plrreportget ~= plr then
+                            local reportreason, reportedmatch = findreport(tab.Message)
+                            if reportreason then 
+                                if alreadyreported[plr] == nil then
+                                    task.spawn(function()
+                                        if syn == nil then
+                                            Players:ReportAbuse(plrreportget, reportreason, "he said a bad word")
+                                        end
+                                    end)
+                                    notify("AutoReport", "Reported "..plrreportget.Name.." for "..reportreason..' ('..reportedmatch..')')
+                                    table.insert(alreadyreported, alreadyreported[plr])
+                                    alreadyreported[plrreportget] = true
+                                end
+                            end
                         end
-                    until DeadPunchEnabled == false
-                end)
-            elseif state == false or Humanoid.Health <= 0 then
-                task.spawn(function()
-                    if PunchPart ~= nil and PunchPart.ClassName == "Part" then
-                        DeadPunchEnabled = false
-                        PunchPart:Destroy()
+                    end)
+                else
+                    notify("Notification", "Autoreport already turned on!")
+                end
+            end
+        },
+        ["UnAutoReport"] = {
+            ["ListName"] = "UnAutoReport / UnAutorep",
+            ["Description"] = "Turn off AutoReport, it will not report and send notify",
+            ["Aliases"] = {"UnAutoReport", "UnAutorep", "unautoreport", "unautorep"},
+            ["Function"] = function(args, speaker)
+                if AutoReportEnabled == true then
+                    AutoReportEnabled = false
+                    notify("Notification", "Autoreport turned off!")
+                    if ReportConnection then
+                        ReportConnection:Disconnect()
                     end
-                end)
-            end
-        end)
-
-    -----------
-
-    --GunTab--
-    local GiveGun = GunTab:NewSection("Give gun")
-    local gunGetCoolDown = false;
-
-    GiveGun:NewButton("Give Choosen gun", "Get your gun you want.", function()
-        task.spawn(function()
-            if GunChoose == "Remington 870" then
-                if (gunGetCoolDown == true) then return end;
-                gunGetCoolDown = true;
-                getItem("Remington 870");
-                gunGetCoolDown = false;
-                gunGetCoolDown = false;
-            elseif GunChoose == "M9" then
-                if (gunGetCoolDown == true) then return end;
-                gunGetCoolDown = true;
-                getItem("M9")
-                gunGetCoolDown = false;
-            elseif GunChoose == "AK-47" then
-                if (gunGetCoolDown == true) then return end;
-                if (gunGetCoolDown == true) then return end;
-                gunGetCoolDown = true;
-                getItem("AK-47")
-                gunGetCoolDown = false;
-            end
-        end)
-    end)
-
-    GiveGun:NewDropdown("Remington 870", "Choose your gun", {"Remington 870", "M9", "AK-47"}, function(currentOption)
-        task.spawn(function()
-            GunChoose = currentOption
-        end)
-    end)
-
-    GiveGun:NewButton("Give all gun", "Give you gun but sometime it will give you breakfast or lunch.", function()
-        task.spawn(function()
-            for i, v in pairs(workspace.Prison_ITEMS.giver:GetChildren()) do
-                local args = {
-                [1] = v:FindFirstChild("ITEMPICKUP")
-            }
-            
-            workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-            end
-           end)
-    end)
-
-
-    local GunMod = GunTab:NewSection("Gun mod")
-    local Gunmodule = nil
-    GunMod:NewToggle("Mod All!", "Make your gun OP!", function(state)
-        if state then
-            task.spawn(function()
-                if Gunmodule ~= nil then
-                    Gunmodule["MaxAmmo"] = 9999
-                    Gunmodule["CurrentAmmo"] = math.huge
-                    Gunmodule["FireRate"] = 0.000001
-                    Gunmodule["Spread"] = math.huge
-                end
-            end)
-        else
-            task.wait()
-        end
-    end)
-
-    GunMod:NewDropdown("Gun Mod Option", "Choose your gun", {"Remington 870", "M9", "AK-47"}, function(toolselect)
-        task.spawn(function()
-            if plr.Backpack:FindFirstChild(toolselect) then
-                Gunmodule = require(plr.Backpack:FindFirstChild(toolselect):FindFirstChild("GunStates"))
-            elseif char:FindFirstChild(toolselect) then
-                Gunmodule = require(char:FindFirstChild(toolselect):FindFirstChild("GunStates"))
-            end
-        end)
-    end)
-
-    local InfAmmoEnabled = false
-
-    GunMod:NewToggle("InfAmmo!", "Make your gun Ammo Infinity!", function(state)
-        if state then
-            task.spawn(function()
-                InfAmmoEnabled = true
-            end)
-        else
-            task.spawn(function()
-                InfAmmoEnabled = false
-            end)
-        end
-    end)
-
-    local LessFireRateEnabled = false
-    GunMod:NewToggle("LessFireRate!", "Make your gun shoot faster!", function(state)
-        if state then
-            task.spawn(function()
-                LessFireRateEnabled = true
-            end)
-        else
-            task.spawn(function()
-                LessFireRateEnabled = false
-            end)
-        end
-    end)
-
-    GunMod:NewToggle("Mod with your custom settings!", "Make your gun OP like you want!", function(state)
-        task.spawn(function()
-            if state then
-                if Gunmodule ~= nil then
-                    Gunmodule["Damage"] = Damage
-                end
-            else
-                task.wait()
-            end
-        end)
-    end)
-    GunMod:NewSlider("Damage", "Change the gun Damage", 100, 10, function(damagecallback)
-        task.spawn(function()
-            Damage = damagecallback
-        end)
-    end)
-
-
-    ----------
-
-    --ServerModerator--
-    local PlayerController = ServerModerator:NewSection("PlayerController")
-    local PlayerControll = nil
-    local KillGunModule
-    local LoopTeleportAllowed = false
-
-    local function GetPlayerTable()
-        task.spawn(function()
-            table.clear(PlayerInGame)
-            for i, v in pairs(game:GetService("Players"):GetPlayers()) do
-               table.insert(PlayerInGame, v.DisplayName)
-            end
-        end)
-    end
-
-    GetPlayerTable()
-    
-    local PlayerControllerDropDown = PlayerController:NewDropdown("Select Player", "Choose Player you want to controll", PlayerInGame, function(plrselect)
-        task.spawn(function()
-            for _, v in pairs(game:GetService("Players"):GetPlayers()) do
-                if tostring(v.DisplayName) == tostring(plrselect) then
-                    PlayerControll = v
                 else
-                    PlayerControll = PlayerControll or v
+                    notify("Notification", "Autoreport already turned off!")
                 end
             end
-        end)
-    end)
-
-    local KillPunch = false
-
-    PlayerController:NewButton("Kill", "Kill player you want!", function()
-        task.spawn(function()
-            local plrlastteam = nil
-
-        if plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-            task.wait()
-        else     
-            local args = {
-                [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
-            }
-
-            workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-        end
-
-        task.wait(.1)
-
-        if PlayerControll ~= nil then
-            local args = {
-                [1] = {
-                    [1] = {
-                        ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-391.1522521972656, 8.655600547790527, -83.21669006347656)),
-                        ["Distance"] = 3.2524313926697,
-                        ["Cframe"] = CFrame.new(Vector3.new(840.310791015625, 101.33413696289062, 2267.8798828125), Vector3.new(0.9864164590835571, -0.15174193680286407, -0.06290365755558014)),
-                        ["Hit"] = PlayerControll.Character.Head
-                    },
-                    [2] = {
-                        ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-392.4814758300781, -8.449393272399902, -76.72613525390625)),
-                        ["Distance"] = 3.2699294090271,
-                        ["Cframe"] = CFrame.new(Vector3.new(840.2904663085938, 101.18418884277344, 2267.93505859375), Vector3.new(0.9935879707336426, -0.05921658128499985, -0.096314437687397)),
-                        ["Hit"] = PlayerControll.Character.Head
-                    },
-                    [3] = {
-                        ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-389.2170104980469, -2.5053632259368896, -92.21631622314453)),
-                        ["Distance"] = 3.1665518283844,
-                        ["Cframe"] = CFrame.new(Vector3.new(840.3388671875, 101.23649597167969, 2267.8037109375), Vector3.new(0.9954167008399963, -0.09418468177318573, -0.016576465219259262)),
-                        ["Hit"] = PlayerControll.Character.Head
-                    },
-                    [4] = {
-                        ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-393.3539733886719, 3.139889717102051, -72.54520416259766)),
-                        ["Distance"] = 3.3218522071838,
-                        ["Cframe"] = CFrame.new(Vector3.new(840.2772216796875, 101.28595733642578, 2267.970703125), Vector3.new(0.9859949350357056, -0.11956311762332916, -0.11626961082220078)),
-                        ["Hit"] = PlayerControll.Character.Head
-                    },
-                    [5] = {
-                        ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-390.7317199707031, 3.2097764015197754, -85.5477523803711)),
-                        ["Distance"] = 3.222757101059,
-                        ["Cframe"] = CFrame.new(Vector3.new(840.3179931640625, 101.28642272949219, 2267.8603515625), Vector3.new(0.9910106658935547, -0.12353070080280304, -0.05136203020811081)),
-                        ["Hit"] = PlayerControll.Character.Head
-                    }
-                },
-                [2] = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild("Remington 870")
-            }
-            
-            game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
-            game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
-            PlayerControll.Character:FindFirstChildWhichIsA("Humanoid").StateChanged:Connect(function(oldstate, newstate)
-                if newstate ~= Enum.HumanoidStateType.Dead then
-                    KillPunch = true
-                    task.wait(.5)
-                    KillPunch = false
-                end
-            end)
-        end
-        end)
-    end)
-
-    PlayerController:NewButton("InstaKill", "Fix Kill Problem and kill player you want!", function()
-        task.spawn(function()
-            local NeutralTeamSwitch = {
-                [1] = "Medium stone grey"
-            }
-            
-            workspace.Remote.TeamEvent:FireServer(unpack(NeutralTeamSwitch))
-
-            local InmatesTeamSwitch = {
-                [1] = "Bright orange"
-            }
-            
-            workspace.Remote.TeamEvent:FireServer(unpack(InmatesTeamSwitch))
-            local lastposInstakill = HumanoidRootPart.CFrame
-            lastposInstakill = HumanoidRootPart.CFrame
-            loadchar();
-
-        HumanoidRootPart.CFrame = lastposInstakill
-
-        if plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-            task.wait()
-        else
-            local args = {
-                [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
-            }
-
-            workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-        end
-
-        if PlayerControll ~= nil then
-            local args = {
-                [1] = {
-                    [1] = {
-                        ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-391.1522521972656, 8.655600547790527, -83.21669006347656)),
-                        ["Distance"] = 3.2524313926697,
-                        ["Cframe"] = CFrame.new(Vector3.new(840.310791015625, 101.33413696289062, 2267.8798828125), Vector3.new(0.9864164590835571, -0.15174193680286407, -0.06290365755558014)),
-                        ["Hit"] = PlayerControll.Character.Head
-                    },
-                    [2] = {
-                        ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-392.4814758300781, -8.449393272399902, -76.72613525390625)),
-                        ["Distance"] = 3.2699294090271,
-                        ["Cframe"] = CFrame.new(Vector3.new(840.2904663085938, 101.18418884277344, 2267.93505859375), Vector3.new(0.9935879707336426, -0.05921658128499985, -0.096314437687397)),
-                        ["Hit"] = PlayerControll.Character.Head
-                    },
-                    [3] = {
-                        ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-389.2170104980469, -2.5053632259368896, -92.21631622314453)),
-                        ["Distance"] = 3.1665518283844,
-                        ["Cframe"] = CFrame.new(Vector3.new(840.3388671875, 101.23649597167969, 2267.8037109375), Vector3.new(0.9954167008399963, -0.09418468177318573, -0.016576465219259262)),
-                        ["Hit"] = PlayerControll.Character.Head
-                    },
-                    [4] = {
-                        ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-393.3539733886719, 3.139889717102051, -72.54520416259766)),
-                        ["Distance"] = 3.3218522071838,
-                        ["Cframe"] = CFrame.new(Vector3.new(840.2772216796875, 101.28595733642578, 2267.970703125), Vector3.new(0.9859949350357056, -0.11956311762332916, -0.11626961082220078)),
-                        ["Hit"] = PlayerControll.Character.Head
-                    },
-                    [5] = {
-                        ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-390.7317199707031, 3.2097764015197754, -85.5477523803711)),
-                        ["Distance"] = 3.222757101059,
-                        ["Cframe"] = CFrame.new(Vector3.new(840.3179931640625, 101.28642272949219, 2267.8603515625), Vector3.new(0.9910106658935547, -0.12353070080280304, -0.05136203020811081)),
-                        ["Hit"] = PlayerControll.Character.Head
-                    }
-                },
-                [2] = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild("Remington 870")
-            }
-            
-            game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
-            game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
-            PlayerControll.Character:FindFirstChildWhichIsA("Humanoid").StateChanged:Connect(function(oldstate, newstate)
-                if newstate ~= Enum.HumanoidStateType.Dead then
-                    KillPunch = true
-                    task.wait(.5)
-                    KillPunch = false
-                end
-            end)
-        end
-        end)
-    end)
-
-    local LoopKillToggle = false
-
-    PlayerController:NewToggle("LoopKill", "Loop kill the player you want!", function(state)
-        if state then
-            if plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-                task.wait()
-            else     
-                local args = {
-                    [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
-                }
-    
-                workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-            end
-            LoopKillToggle = state
-        else
-            LoopKillToggle = state
-        end
-    end)
-
-    PlayerController:NewButton("Punch", "Punch Player you want!", function()
-        if PlayerControll ~= nil then
-            if PlayerControll ~= nil then
-                if (0 - (PlayerControll.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude)) < 20 then
-                    local args = {
-                        [1] = PlayerControll
-                    }
-    
-                    game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
-                else
-                    local PunchOldPos = HumanoidRootPart.CFrame
-                    HumanoidRootPart.CFrame = PlayerControll.Character:FindFirstChild("HumanoidRootPart").CFrame or PlayerControll.Character:FindFirstChild("Torso").CFrame
-                    task.wait(.1)
-                    local args = {
-                        [1] = PlayerControll
-                    }
-    
-                    game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
-                    task.wait(.1)
-                    HumanoidRootPart.CFrame = PunchOldPos
-                end
-            end
-        end
-    end)
-
-    PlayerController:NewButton("Arrest", "Arrest the player you want!", function()
-       task.spawn(function()
-        local BeforeArrestOldpos
-        local OldTeamBeforeArrest
-        if PlayerControll ~= nil then
-            OldTeamBeforeArrest = "Bright orange"
-
-            if plr.Team == "Guards" then
-                BeforeArrestOldpos = char:FindFirstChild("HumanoidRootPart").CFrame
-                LoopTeleportAllowed = true
-                local HandleArrest = {
-                    [1] = PlayerControll.Character.Head
-                }
-                
-                workspace.Remote.ItemHandler:InvokeServer(unpack(HandleArrest))
-                
-                local arrestremote = {
-                    [1] = PlayerControll.Character.Head
-                }
-                
-                workspace.Remote.arrest:InvokeServer(unpack(arrestremote))
-                LoopTeleportAllowed = false
-                char:FindFirstChild("HumanoidRootPart").CFrame = BeforeArrestOldpos
-                if plr.TeamColor == OldTeamBeforeArrest then
-                    task.wait()
-                else
-                    local args = {
-                        [1] = OldTeamBeforeArrest
-                    }
-                    
-                    workspace.Remote.TeamEvent:FireServer(unpack(args))
-                end
-            else
-                local args = {
-                    [1] = "Bright blue"
-                }
-                
-                workspace.Remote.TeamEvent:FireServer(unpack(args))
-                BeforeArrestOldpos = char:FindFirstChild("HumanoidRootPart").CFrame
-                LoopTeleportAllowed = true
-                local HandleArrest = {
-                    [1] = PlayerControll.Character.Head
-                }
-                
-                workspace.Remote.ItemHandler:InvokeServer(unpack(HandleArrest))
-                
-                local arrestremote = {
-                    [1] = PlayerControll.Character.Head
-                }
-                
-                workspace.Remote.arrest:InvokeServer(unpack(arrestremote))
-                LoopTeleportAllowed = false
-                char:FindFirstChild("HumanoidRootPart").CFrame = BeforeArrestOldpos
-                if plr.TeamColor == OldTeamBeforeArrest then
-                    task.wait()
-                else
-                    local args = {
-                        [1] = OldTeamBeforeArrest
-                    }
-                    
-                    workspace.Remote.TeamEvent:FireServer(unpack(args))
-                end
-            end
-           end
-       end)
-    end)
-
-    local LoopTeleportBring = false
-
-    PlayerController:NewButton("Criminal", "Turn player you want into criminal", function()
-        loadchar();
-
-        local oldposbeforebring = char:FindFirstChild("HumanoidRootPart").CFrame
-
-        local Knifepickup = {
-            [1] = workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP
-        }
-
-        workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
-
-        task.wait(.1)
-
-        char:FindFirstChildWhichIsA("Humanoid"):Destroy()
-        Instance.new("Humanoid", char)
-
-        if plr.Backpack:FindFirstChild("Crude Knife") then
-            plr.Backpack:FindFirstChild("Crude Knife").Parent = char
-        elseif char:FindFirstChild("Crude Knife") then
-            task.wait()
-        elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-            workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
-            plr.Backpack:FindFirstChild("Crude Knife").Parent = char
-        end
-        LoopTeleportBring = true
-        task.wait(.5)
-        LoopTeleportBring = false
-        char:FindFirstChild("HumanoidRootPart").CFrame = game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation").CFrame
-        task.wait(.5)
-        loadchar();
-        task.wait(.1)
-        char:FindFirstChild("HumanoidRootPart").CFrame = oldposbeforebring
-    end)
-
-    PlayerController:NewButton("Freeze", "Using Taser to make player freeze", function()
-        task.spawn(function()
-            if plr.Team == "Guards" then
-                task.wait()
-            else
-                local args = {
-                    [1] = "Bright blue"
-                }
-                
-                workspace.Remote.TeamEvent:FireServer(unpack(args))
-                task.wait(.1)
-                    local oldcharbeforefreeze = HumanoidRootPart.CFrame
-                    loadchar();
-                    if PlayerControll ~= nil then
-                        local TaserShoot = {
-                            [1] = {
-                                [1] = {
-                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-391.1522521972656, 8.655600547790527, -83.21669006347656)),
-                                    ["Distance"] = 3.2524313926697,
-                                    ["Cframe"] = CFrame.new(Vector3.new(840.310791015625, 101.33413696289062, 2267.8798828125), Vector3.new(0.9864164590835571, -0.15174193680286407, -0.06290365755558014)),
-                                    ["Hit"] = PlayerControll.Character.Head
-                                },
-                                [2] = {
-                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-392.4814758300781, -8.449393272399902, -76.72613525390625)),
-                                    ["Distance"] = 3.2699294090271,
-                                    ["Cframe"] = CFrame.new(Vector3.new(840.2904663085938, 101.18418884277344, 2267.93505859375), Vector3.new(0.9935879707336426, -0.05921658128499985, -0.096314437687397)),
-                                    ["Hit"] = PlayerControll.Character.Head
-                                },
-                                [3] = {
-                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-389.2170104980469, -2.5053632259368896, -92.21631622314453)),
-                                    ["Distance"] = 3.1665518283844,
-                                    ["Cframe"] = CFrame.new(Vector3.new(840.3388671875, 101.23649597167969, 2267.8037109375), Vector3.new(0.9954167008399963, -0.09418468177318573, -0.016576465219259262)),
-                                    ["Hit"] = PlayerControll.Character.Head
-                                },
-                                [4] = {
-                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-393.3539733886719, 3.139889717102051, -72.54520416259766)),
-                                    ["Distance"] = 3.3218522071838,
-                                    ["Cframe"] = CFrame.new(Vector3.new(840.2772216796875, 101.28595733642578, 2267.970703125), Vector3.new(0.9859949350357056, -0.11956311762332916, -0.11626961082220078)),
-                                    ["Hit"] = PlayerControll.Character.Head
-                                },
-                                [5] = {
-                                    ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-390.7317199707031, 3.2097764015197754, -85.5477523803711)),
-                                    ["Distance"] = 3.222757101059,
-                                    ["Cframe"] = CFrame.new(Vector3.new(840.3179931640625, 101.28642272949219, 2267.8603515625), Vector3.new(0.9910106658935547, -0.12353070080280304, -0.05136203020811081)),
-                                    ["Hit"] = PlayerControll.Character.Head
-                                }
-                            },
-                            [2] = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild("Taser")
-                        }
-                        
-                        game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(TaserShoot))
-                        if plr.Team == "Inmates" then
-                            task.wait()
-                        else
-                            local args = {
-                                [1] = "Bright orange"
-                            }
+        },
+        ["HackerDetector"] = {
+            ["ListName"] = "HackerDetector",
+            ["Description"] = "Detect Cheater or Hacker Classic Type!",
+            ["Aliases"] = {"HackerDetector", "hackerdetector"},
+            ["Function"] = function(args, speaker)
+                if args[1] then
+                    if args[1]:lower() == "true" or tostring(args[1]):lower() == "on" then
+                        if HackerDetectorEnabled == false then
+                            HackerDetectorEnabled = true
+                            notify("Notification", "HackerDetector is On")
+                            HackerDetectorConnection = game:GetService("RunService").Stepped:Connect(function(time, deltaTime)
+                                task.spawn(function()
+                                    if HackerDetectorEnabled == true then
+                                        for plrcount, allplrs in pairs(game:GetService("Players"):GetPlayers()) do
+                                            local allchars = allplrs.Character or allplrs.CharacterAdded
+                                            if allplrs ~= nil then
+                                                if allchars and getRoot(allchars) and allchars:FindFirstChildWhichIsA("Humanoid") then
+                                                    task.spawn(function()
+                                                        local AnotherHumanoidRootPart = getRoot(allchars)
+                                                        local OldPos = AnotherHumanoidRootPart.Position
+                                                        task.wait(.5)
+                                                        local NewPos = AnotherHumanoidRootPart.Position
+                                                        if (NewPos - OldPos).Magnitude > (Humanoid.WalkSpeed + 15) and allchars:FindFirstChildWhichIsA("Humanoid").Sit == false and not allchars:FindFirstChildWhichIsA("ForceField") then
+                                                            notify("HackerDetector", "User: " .. tostring(allplrs.Name) .. ", Display: " .. tostring(allplrs.DisplayName) .. "\n Speed, Teleport Cheating, Type: MagnitudeDetect")
+                                                            
+                                                            if (args[2]) then
+                                                                if (args[2] == "true" or args[2] == "on") then
+                                                                    Players:ReportAbuse(plrreportget, reportreason, "he keep using SPEED and TELEPORT everywhere to KILL everyone in the game")
+                                                                end
+                                                            end
+                                                        end
+                                                    end)
+                                                end
                             
-                            workspace.Remote.TeamEvent:FireServer(unpack(args))
+                                                if allchars:FindFirstChildWhichIsA("Humanoid") then
+                                                    if allchars:WaitForChild("Humanoid").PlatformStand == true then
+                                                        notify("HackerDetector", "User: " .. tostring(allplrs.Name) .. ", Display: " .. tostring(allplrs.DisplayName) .. "\n Fly Cheating, Type: FlatformStanding")
+                                                        Players:ReportAbuse(plrreportget, reportreason, "he's FLYING arround the game, and something FLING me")
+
+                                                        if (args[2]) then
+                                                            if (args[2] == "true" or args[2] == "on") then
+                                                                Players:ReportAbuse(plrreportget, reportreason, "he's FLYING arround the game, and something FLING me")
+                                                            end
+                                                        end
+                                                    end
+                                                end
+
+                                               --[[
+                                                 if allchars:FindFirstChild("Torso") or allchars:FindFirstChild("UpperTorso") then
+                                                    if allchars:FindFirstChild("Torso") and allchars:FindFirstChild("Torso").CanCollide == false and allchars:FindFirstChild("Torso").CollisionGroupId == 0 and not allchars:FindFirstChild("UpperTorso") then
+                                                        notify("HackerDetector", "User: " .. tostring(allplrs.Name) .. ", Display: " .. tostring(allplrs.DisplayName) .. "\n Noclip, Type: CanCollide")
+                                                        Players:ReportAbuse(plrreportget, reportreason, "he's HACKING and KILL everyone in the game")
+                                                        if (args[2]) then
+                                                            if (args[2] == "true" or args[2] == "on") then
+                                                                Players:ReportAbuse(plrreportget, reportreason, "he's HACKING and KILL everyone in the game")
+                                                            end
+                                                        end
+                                                    elseif not allchars:FindFirstChild("Torso") and allchars:FindFirstChild("UpperTorso") and allchars:FindFirstChild("UpperTorso").CanCollide == false and allchars:FindFirstChild("UpperTorso").CollisionGroupId == 0 then
+                                                        notify("HackerDetector", "User: " .. tostring(allplrs.Name) .. ", Display: " .. tostring(allplrs.DisplayName) .. "\n Noclip, Type: CanCollide")
+                                                        if (args[2]) then
+                                                            if (args[2] == "true" or args[2] == "on") then
+                                                                Players:ReportAbuse(plrreportget, reportreason, "he's HACKING and KILL everyone in the game")
+                                                            end
+                                                        end
+                                                    end
+                                                end
+                                                --]]
+                                            end
+                                        end
+                                        task.wait(.1)
+                                    end
+                               end)
+                            end)
+                        else
+                            notify("Notification", "It already turned on")
                         end
-                        local FreezeLoadChar1 = {
-                            [1] = plr.Name
-                        }
-                        
-                        loadchar();
-                        task.wait(.1)
-                        HumanoidRootPart.CFrame = oldcharbeforefreeze
+                    elseif args[1]:lower() == "false" or tostring(args[1]):lower() == "off" then
+                        if HackerDetectorEnabled == true then
+                            notify("Notification", "HackerDetector is Off")
+                            HackerDetectorEnabled = false
+                            if HackerDetectorConnection then
+                                HackerDetectorConnection:Disconnect()
+                            end
+                        else
+                            notify("Notification", "It already turned off")
+                        end
                     end
+                else
+                    notify("Notification", "You must set status like HackerDetector mode: ['on/off' or 'true/false']; Report player: ['on/off' or 'true/false']")
+                end
             end
-        end)
-    end)
-
-    PlayerController:NewButton("Bring", "Bring player you want to you!", function()
-        loadchar();
-
-        local oldposbeforebring = char:FindFirstChild("HumanoidRootPart").CFrame
-
-        local Knifepickup = {
-            [1] = workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP
-        }
-
-        workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
-
-        task.wait(.1)
-
-        char:FindFirstChildWhichIsA("Humanoid"):Destroy()
-        Instance.new("Humanoid", char)
-
-        if plr.Backpack:FindFirstChild("Crude Knife") then
-            plr.Backpack:FindFirstChild("Crude Knife").Parent = char
-        elseif char:FindFirstChild("Crude Knife") then
-            task.wait()
-        elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-            local Knifepickup = {
-                [1] = workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP
-            }
-    
-            workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
-            plr.Backpack:FindFirstChild("Crude Knife").Parent = char
-        end
-        LoopTeleportBring = true
-        task.wait(.5)
-        LoopTeleportBring = false
-        char:FindFirstChild("HumanoidRootPart").CFrame = oldposbeforebring
-        task.wait(.5)
-        loadchar();
-        task.wait(.1)
-        char:FindFirstChild("HumanoidRootPart").CFrame = oldposbeforebring
-    end)
-
-    PlayerController:NewButton("Trap", "Trap player you want into a building!", function()
-        loadchar();
-        local oldposbeforebring = char:FindFirstChild("HumanoidRootPart").CFrame
-
-        local Knifepickup = {
-            [1] = workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP
-        }
-
-        workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
-
-        task.wait(.1)
-
-        char:FindFirstChildWhichIsA("Humanoid"):Destroy()
-        Instance.new("Humanoid", char)
-
-        if plr.Backpack:FindFirstChild("Crude Knife") then
-            plr.Backpack:FindFirstChild("Crude Knife").Parent = char
-        elseif char:FindFirstChild("Crude Knife") then
-            task.wait()
-        elseif not plr.Backpack:FindFirstChild("Crude Knife") or char:FindFirstChild("Crude Knife") then
-            local args = {
-                [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Crude Knife").ITEMPICKUP
-            }
-
-            workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-            plr.Backpack:FindFirstChild("Crude Knife").Parent = char
-        end
-        LoopTeleportBring = true
-        task.wait(.5)
-        LoopTeleportBring = false
-        char:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(-328.772797, 84.2401199, 1953.56274, -0.774003625, 3.31737269e-08, -0.633181155, 4.14672492e-08, 1, 1.70239745e-09, 0.633181155, -2.49386201e-08, -0.774003625)
-        task.wait(.5)
-        loadchar();
-        task.wait(.1)
-        char:FindFirstChild("HumanoidRootPart").CFrame = oldposbeforebring
-    end)
-    local SpectateConnection = nil
-    local viewDied = nil
-
-    PlayerController:NewToggle("Spectate", "Wiew player cam", function(state)
-        if state then
-            if PlayerControll ~= nil then
-                task.spawn(function()
-                    if PlayerControll.Character then
-                        game:GetService("Workspace").CurrentCamera.CameraSubject = PlayerControll.Character
-                        -- from inf yield
-                        local function viewDiedFunc()
-                            repeat wait() until PlayerControll.Character ~= nil 
-                            workspace.CurrentCamera.CameraSubject = PlayerControll.Character
+        },
+        ["BetterGodMode"] = {
+            ["ListName"] = "BetterGodMode / BGodmode [on/off]",
+            ["Description"] = "Make you turn into god!",
+            ["Aliases"] = {"BetterGodMode", "BGodmode", "bettergodMode", "bgodmode", "bgod"},
+            ["Function"] = function(args, speaker)
+                if args[1] then
+                    if tostring(args[1]):lower() == "on" then
+                        if BetterGodModeEnabled == false then
+                            BetterGodModeEnabled = true
+                            local sureRagdoll = false;
+                            notify("Notification", "You are god now!")
+                            if speaker.Character and speaker.Character:FindFirstChildWhichIsA("Humanoid") then
+                                BetterGodModeConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                                    if speaker.Character:FindFirstChildWhichIsA("Humanoid") then
+                                        speaker.Character:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false
+                                        speaker.Character:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+                                        if speaker.Character:FindFirstChildWhichIsA("Humanoid").Health <= 0 then
+                                            speaker.Character:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false
+                                            speaker.Character:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+                                            speaker.Character:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, true)
+                                            speaker.Character:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+                                            if BetterGodModeRespawnCheck == false then
+                                                BetterGodModeRespawnCheck = true
+                                                local oldrespawnpos = speaker.Character:GetPivot()
+                                                local oldcameracframe = game:GetService("Workspace").CurrentCamera.CFrame
+                                                task.wait(game:GetService("Players").RespawnTime - 0.1)
+                                                oldrespawnpos = speaker.Character:GetPivot()
+                                                oldcameracframe = game:GetService("Workspace").CurrentCamera.CFrame
+                                                task.wait(0.1)
+                                                speaker.Character:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
+                                                task.wait(0.1)
+                                                repeat task.wait() until speaker.Character and game:GetService("Workspace").CurrentCamera
+                                                speaker.Character:PivotTo(oldrespawnpos)
+                                                if (speaker.Character and speaker.Character:FindFirstChild("HumanoidRootPart")) then
+                                                    speaker.Character:FindFirstChild("HumanoidRootPart").Position = speaker.Character:FindFirstChild("HumanoidRootPart").Position
+                                                end
+                                                game:GetService("Workspace").CurrentCamera.CFrame = oldcameracframe
+                                                speaker.Character:PivotTo(oldrespawnpos)
+                                                if (speaker.Character and speaker.Character:FindFirstChild("HumanoidRootPart")) then
+                                                    speaker.Character:FindFirstChild("HumanoidRootPart").Position = speaker.Character:FindFirstChild("HumanoidRootPart").Position
+                                                end
+                                                game:GetService("Workspace").CurrentCamera.CFrame = oldcameracframe
+                                                speaker.Character:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+                                                speaker.Character:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, false)
+                                                speaker.Character:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Ragdoll, true)
+                                                BetterGodModeRespawnCheck = false
+                                            end
+                                        end
+                                    end
+                                end)
+                            end
+                        else
+                            notify("Notification", "BetterGodMode already turned on!")
                         end
-                        viewDied = PlayerControll.CharacterAdded:Connect(viewDiedFunc)
-                        local function CameraSubject()
-                            game:GetService("Workspace").CurrentCamera.CameraSubject = PlayerControll.Character
+                    elseif tostring(args[1]):lower() == "off" then
+                        if BetterGodModeEnabled == true then
+                            if BetterGodModeConnection then
+                                notify("Notification", "You turned off god mode")
+                                BetterGodModeConnection:Disconnect()
+                            end
+                        else
+                            notify("Notification", "BetterGodMode already turned off!")
                         end
-                        SpectateConnection = game:GetService("Workspace").CurrentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(CameraSubject)
                     end
-                end)
-            end
-        else
-           task.spawn(function()
-            if SpectateConnection ~= nil then
-                SpectateConnection:Disconnect()
-                viewDied:Disconnect()
-            end
-            game:GetService("Workspace").CurrentCamera.CameraSubject = char
-           end)
-        end
-    end)
-
-
-    PlayerController:NewButton("Teleport", "Teleport to selected player!", function()
-        task.spawn(function()
-            if PlayerControll ~= nil then
-                if Humanoid and Humanoid.Sit == true then
-                    Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-                end
-                task.wait(.1)
-                char:FindFirstChild("HumanoidRootPart").CFrame = PlayerControll.Character:FindFirstChild("HumanoidRootPart").CFrame
-            end
-        end)
-    end)
-
-    PlayerController:NewToggle("LoopTeleport", "Teleport to selected player!", function(state)
-        if state then
-            task.spawn(function()
-               LoopTeleportAllowed = state
-            end)
-        else
-            task.spawn(function()
-                LoopTeleportAllowed = state
-            end)
-        end
-    end)
-
-    local SwitchTeam = nil
-
-    PlayerController:NewDropdown("Team", "Choose team you want", {"Inmates", "Criminals"}, function(teamselect)
-        task.spawn(function()
-            SwitchTeam = tostring(teamselect)
-        end)
-    end)
-
-    PlayerController:NewButton("SwitchTeam", "Switch player team", function()
-        if SwitchTeam == "Inmates" then
-            loadchar();
-    
-            local oldposbeforebring = char:FindFirstChild("HumanoidRootPart").CFrame
-    
-            local Knifepickup = {
-                [1] = workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP
-            }
-    
-            workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
-    
-            task.wait(.1)
-    
-            char:FindFirstChildWhichIsA("Humanoid"):Destroy()
-            Instance.new("Humanoid", char)
-    
-            if plr.Backpack:FindFirstChild("Crude Knife") then
-                plr.Backpack:FindFirstChild("Crude Knife").Parent = char
-            elseif char:FindFirstChild("Crude Knife") then
-                task.wait()
-            elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-                workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
-                plr.Backpack:FindFirstChild("Crude Knife").Parent = char
-            end
-            LoopTeleportBring = true
-            task.wait(.5)
-            LoopTeleportBring = false
-            char:FindFirstChild("HumanoidRootPart").CFrame = game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation").CFrame
-            task.wait(.5)
-            loadchar();
-            task.wait(.1)
-            char:FindFirstChild("HumanoidRootPart").CFrame = oldposbeforebring
-            task.wait(.1)
-            local BeforeArrestOldpos
-        local OldTeamBeforeArrest
-        if PlayerControll ~= nil then
-            OldTeamBeforeArrest = "Bright orange"
-
-            if plr.Team == "Guards" then
-                BeforeArrestOldpos = char:FindFirstChild("HumanoidRootPart").CFrame
-                LoopTeleportAllowed = true
-                local HandleArrest = {
-                    [1] = PlayerControll.Character.Head
-                }
-                
-                workspace.Remote.ItemHandler:InvokeServer(unpack(HandleArrest))
-                
-                local arrestremote = {
-                    [1] = PlayerControll.Character.Head
-                }
-                
-                workspace.Remote.arrest:InvokeServer(unpack(arrestremote))
-                LoopTeleportAllowed = false
-                char:FindFirstChild("HumanoidRootPart").CFrame = BeforeArrestOldpos
-                if plr.TeamColor == OldTeamBeforeArrest then
-                    task.wait()
                 else
-                    local args = {
-                        [1] = OldTeamBeforeArrest
-                    }
-                    
-                    workspace.Remote.TeamEvent:FireServer(unpack(args))
-                end
-            else
-                local args = {
-                    [1] = "Bright blue"
-                }
-                
-                workspace.Remote.TeamEvent:FireServer(unpack(args))
-                BeforeArrestOldpos = char:FindFirstChild("HumanoidRootPart").CFrame
-                LoopTeleportAllowed = true
-                local HandleArrest = {
-                    [1] = PlayerControll.Character.Head
-                }
-                
-                workspace.Remote.ItemHandler:InvokeServer(unpack(HandleArrest))
-                
-                local arrestremote = {
-                    [1] = PlayerControll.Character.Head
-                }
-                
-                workspace.Remote.arrest:InvokeServer(unpack(arrestremote))
-                LoopTeleportAllowed = false
-                char:FindFirstChild("HumanoidRootPart").CFrame = BeforeArrestOldpos
-                if plr.TeamColor == OldTeamBeforeArrest then
-                    task.wait()
-                else
-                    local args = {
-                        [1] = OldTeamBeforeArrest
-                    }
-                    
-                    workspace.Remote.TeamEvent:FireServer(unpack(args))
+                    notify("Notification", "You must set status for BetterGodMode [on/off]")
                 end
             end
-           end
-        elseif SwitchTeam == "Criminals" then
-            loadchar();
-    
-            local oldposbeforebring = char:FindFirstChild("HumanoidRootPart").CFrame
-    
-            local Knifepickup = {
-                [1] = workspace.Prison_ITEMS.single:FindFirstChild("Crude Knife").ITEMPICKUP
-            }
-    
-            workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
-    
-            task.wait(.1)
-    
-            char:FindFirstChildWhichIsA("Humanoid"):Destroy()
-            Instance.new("Humanoid", char)
-    
-            if plr.Backpack:FindFirstChild("Crude Knife") then
-                plr.Backpack:FindFirstChild("Crude Knife").Parent = char
-            elseif char:FindFirstChild("Crude Knife") then
-                task.wait()
-            elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-                workspace.Remote.ItemHandler:InvokeServer(unpack(Knifepickup))
-                plr.Backpack:FindFirstChild("Crude Knife").Parent = char
+        },
+        ["FlyTeleport"] = {
+            ["ListName"] = "FlyTeleport / Flytp [speed]",
+            ["Description"] = "Make you freeze and will teleport you after fly",
+            ["Aliases"] = {"FlyTeleport", "Flytp", "flyteleport", "flytp"},
+            ["Function"] = function(args, speaker)
+                if speaker.Character and speaker.Character:FindFirstChild("Head") then
+                    local Head = speaker.Character:FindFirstChild("Head")
+                    Head.Anchored = true
+                    if args[1] then
+                        execCmd("cfly " .. tostring(args[1]))
+                    else
+                        execCmd("cfly 20")
+                    end
+                end
             end
-            LoopTeleportBring = true
-            task.wait(.5)
-            LoopTeleportBring = false
-            char:FindFirstChild("HumanoidRootPart").CFrame = game:GetService("Workspace"):FindFirstChild("Criminals Spawn"):FindFirstChild("SpawnLocation").CFrame
-            task.wait(.5)
-            loadchar();
-            task.wait(.1)
-            char:FindFirstChild("HumanoidRootPart").CFrame = oldposbeforebring
-        end
-    end)
-
-    local GiveToolChoosen = nil
-
-    PlayerController:NewDropdown("Tool", "Choose tool you want to give", {"Remington 870", "M9", "AK-47", "Crude Knife", "Hammer", "Taser", "Handcuffs"}, function(toolselect)
-        task.spawn(function()
-            GiveToolChoosen = tostring(toolselect)
-        end)
-    end)
-
-    PlayerController:NewButton("Give Tool", "Give Tool you want to player", function()
-        task.spawn(function()
-            loadchar();
-            local oldposbeforebring = char:FindFirstChild("HumanoidRootPart").CFrame
-            
-            if GiveToolChoosen == "Remington 870" then
-                getItem("Remington 870")
-            elseif GiveToolChoosen == "M9" then
-                getItem("M9")
-            elseif GiveToolChoosen == "AK-47" then
-                getItem("AK-47")
-            elseif GiveToolChoosen  == "Crude Knife" then
-                getItem("Knife")
-            elseif GiveToolChoosen == "Hammer" then
-                getItem("Hammer")
-            elseif GiveToolChoosen == "Taser" then
-                local guardthing = {
-                    [1] = "Bright blue"
-                }
-                
-                workspace.Remote.TeamEvent:FireServer(unpack(guardthing))
-                loadchar();
-            elseif GiveToolChoosen == "Handcuffs" then
-                local guardthing = {
-                    [1] = "Bright blue"
-                }
-                
-                workspace.Remote.TeamEvent:FireServer(unpack(guardthing))
-                loadchar();
+        },
+        ["UnFlyTeleport"] = {
+            ["ListName"] = "UnFlyTeleport / UnFlytp [speed]",
+            ["Description"] = "Make you freeze and will teleport you after fly",
+            ["Aliases"] = {"UnFlyTeleport", "UnFlytp", "unflyteleport", "unflytp"},
+            ["Function"] = function(args, speaker)
+                if speaker.Character and speaker.Character:FindFirstChild("Head") then
+                    local Head = speaker.Character:FindFirstChild("Head")
+                    Head.Anchored = false
+                    execCmd("uncfly")
+                    execCmd("tpwalk 0")
+                    execCmd("untpwalk")
+                end
             end
-
-            task.wait(.1)
-    
-            char:FindFirstChildWhichIsA("Humanoid"):Destroy()
-            Instance.new("Humanoid", char)
-    
-            if plr.Backpack:FindFirstChild(GiveToolChoosen) then
-                plr.Backpack:FindFirstChild(GiveToolChoosen).Parent = char
-            elseif char:FindFirstChild(GiveToolChoosen) then
-                task.wait()
-            elseif not plr.Backpack:FindFirstChild("Remington 870") or char:FindFirstChild("Remington 870") then
-                local args = {
-                    [1] = workspace.Prison_ITEMS.giver:FindFirstChild("Remington 870").ITEMPICKUP
-                }
-    
-                workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-                plr.Backpack:FindFirstChild("Remington 870").Parent = char
-            end
-            LoopTeleportBring = true
-            task.wait(.5)
-            LoopTeleportBring = false
-            task.wait(.5)
-            loadchar();
-            task.wait(.1)
-            char:FindFirstChild("HumanoidRootPart").CFrame = oldposbeforebring
-        end)
-    end)
-
-
-
-    -------------------
-
-    --ExploitTab--
-    local CrashServer = ExploitTab:NewSection("ServerCrasher")
-    local MaxCrashPacket = 20
-    local Raypos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
-    local RayRotatepos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
-    local CrashServerType = "GunCrash"
-    local PacketCrashTable = {
-        [1] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [2] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [3] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [4] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [5] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [6] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [7] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [8] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [9] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [10] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [11] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [12] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [13] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [14] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [15] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [16] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [17] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [18] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [19] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [20] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [21] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [22] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [23] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [24] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [25] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [26] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [27] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [28] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [29] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [30] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [31] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [32] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [33] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [34] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [35] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [36] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [37] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [38] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [39] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [40] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [41] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [42] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [43] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [44] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [45] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [46] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [47] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [48] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [49] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
-        },
-        [50] = {
-            ["RayObject"] = Ray.new(Raypos, RayRotatepos),
-            ["Distance"] = 5.194826602935791,
-            ["Cframe"] = CFrame.new(0, 0, 0),
-            ["Hit"] = workspace.Prison_Cafeteria.Prison_table1.table1.Part
         },
     }
+}
 
-    CrashServer:NewToggle("Crash!", "Make the server laggy roblox will shut down it!", function(state)
-        if state == true then
-            task.spawn(function()
-                if CrashServerType == "RespawnCrash" then
-                    local args = {
-                        [1] = "Bright blue"
-                    }
-                    
-                    workspace.Remote.TeamEvent:FireServer(unpack(args))
-                end
-                CrashServerMode = true
-            end)
-        else
-            task.spawn(function()
-                CrashServerMode = false
-            end)
-        end
-    end)
-
-    CrashServer:NewDropdown("CrashType", "Choose Type of server crash", {"GunCrash", "CarSpamCrash", "RespawnCrash", "PunchCrash"}, function(crashchoose)
-        task.spawn(function()
-            CrashServerType = tostring(crashchoose)
-        end)
-    end)
-
-    CrashServer:NewDropdown("GunCrash", "Choose your gun", {"Remington 870", "M9", "AK-47"}, function(toolselect)
-        task.spawn(function()
-            GunCrashChoose = toolselect
-            if GunCrashChoose == "Remington 870" then
-                GunCrashModule = game:GetService("Players").LocalPlayer.Character:FindFirstChild("Remington 870")
-            elseif GunCrashChoose == "M9" then
-                GunCrashModule = game:GetService("Players").LocalPlayer.Character:FindFirstChild("M9")
-            elseif GunCrashChoose == "AK-47" then
-                GunCrashModule = game:GetService("Players").LocalPlayer.Character:FindFirstChild("AK-47")
-            end
-        end)
-    end)
-
-    CrashServer:NewSlider("Packet", "Change Max Crash Packet", 100, 20, function(PacketCallBack)
-       task.spawn(function()
-            MaxCrashPacket = tonumber(PacketCallBack)
-       end)
-    end)
-
-    local RemoveAllDoor = ExploitTab:NewSection("Door")
-    local RemoteAllDoorLoop = false
-    local oldremovedoorteam
-
-    RemoveAllDoor:NewToggle("Remove All Doors", "Remove all door in server sidely everyone will see the door remove!", function(state)
-        if state then
-            task.spawn(function()
-                oldremovedoorteam = plr.TeamColor
-                if plr.Team == "Guards" then
-                    task.wait()
-                else
-                    if plr.Backpack:FindFirstChild("Keycard") then
-                        RemoteAllDoorLoop = true
-                    else
-                        local args = {
-                            [1] = "Bright blue"
-                        }
-                        
-                        workspace.Remote.TeamEvent:FireServer(unpack(args))
-                        RemoteAllDoorLoop = true
-                    end
-                end
-            end)
-        else
-            task.spawn(function()
-                RemoteAllDoorLoop = false
-                if oldremovedoorteam == nil or oldremovedoorteam == "" then
-                    task.wait()
-                else
-                    if plr.TeamColor ~= oldremovedoorteam then
-                        RemoteAllDoorLoop = false
-                        local args = {
-                            [1] = "Bright orange"
-                        }
-                        
-                        workspace.Remote.TeamEvent:FireServer(unpack(args))
-                    end
-                end
-            end)
-        end
-    end)
-
-    local ConsoleSpammer = ExploitTab:NewSection("ConsoleSpammer")
-    local ConsoleSpammerEnabled = false
-    ConsoleSpammer:NewToggle("Toggle", "Spam server side console error", function(state)
-        if state == true then
-            if game:GetService("ReplicatedStorage"):FindFirstChild("ServerConsoleError") then
-                task.wait()
-            else
-                local InvaldPart = Instance.new("Part", game:GetService("ReplicatedStorage"))
-                InvaldPart.Name = "ServerConsoleError"
-            end
-            ConsoleSpammerEnabled = state
-        else
-            ConsoleSpammerEnabled = state
-            if game:GetService("ReplicatedStorage"):FindFirstChild("ServerConsoleError") then
-                game:GetService("ReplicatedStorage"):FindFirstChild("ServerConsoleError"):Destroy()
-            end
-        end
-    end)
-
-    local GodMode = ExploitTab:NewSection("GodMode")
-    local GodModeEnabled = nil;
-    local GodModeHealth = nil;
-    local GodModeCharCheck = nil;
-
-    GodMode:NewToggle("GodMode", "Turn you into god!", function(state)
-        if state then
-            task.spawn(function()
-                if (not Humanoid or not HumanoidRootPart) then return end;
-                local oldCFrame = nil;
-
-                GodModeEnabled = char:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
-                    task.spawn(function()
-                        if (char:FindFirstChild("Head") and char:FindFirstChild("Head"):FindFirstChild("handcuffedGui")) then return end;
-                        char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
-                        char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
-                        oldCFrame = HumanoidRootPart.CFrame;
-                        loadchar();
-                    end)
-                end)
-
-                GodModeHealth = char:FindFirstChildWhichIsA("Humanoid").HealthChanged:Connect(function(healthChanged)
-                    if (healthChanged <= 0) then
-                        char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
-                        char:FindFirstChildWhichIsA("Humanoid"):ChangeState(Enum.HumanoidStateType.Dead);
-                    end
-                end)
-
-                GodModeCharCheck = plr.CharacterAdded:Connect(function(charadded)
-                    task.spawn(function()
-                        repeat task.wait() until charadded:FindFirstChildWhichIsA("Humanoid") and charadded:FindFirstChild("HumanoidRootPart");
-
-                        if (oldCFrame == nil) then return end;
-                        plr.Character:FindFirstChild("HumanoidRootPart").CFrame = oldCFrame;
-                        oldCFrame = nil;
-                        char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
-
-                        GodModeEnabled = charadded:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
-                            if (charadded:FindFirstChild("Head") and charadded:FindFirstChild("Head"):FindFirstChild("handcuffedGui")) then return end;
-                            charadded:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
-                            charadded:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
-                            oldCFrame = charadded:FindFirstChild("HumanoidRootPart").CFrame;
-                            loadchar();
-                        end)
-
-                        GodModeHealth = charadded:FindFirstChildWhichIsA("Humanoid").HealthChanged:Connect(function(healthChanged)
-                            if (healthChanged <= 0) then
-                                charadded:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
-                                charadded:FindFirstChildWhichIsA("Humanoid"):ChangeState(Enum.HumanoidStateType.Dead);
-                            end
-                        end)
-                    end)
-                end)
-            end)
-        else
-            task.spawn(function()
-                if (GodModeEnabled) then
-                    GodModeEnabled:Disconnect()
-                    GodModeEnabled = nil;
-                end
-
-                if (GodModeCharCheck) then
-                    GodModeCharCheck:Disconnect()
-                    GodModeCharCheck = nil;
-                end
-
-                if (GodModeHealth) then
-                    GodModeHealth:Disconnect()
-                    GodModeHealth = nil;
-                end
-
-                char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = true;
-                char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
-            end)
-        end
-    end)
-
-    local AntiArrest = ExploitTab:NewSection("AntiArrest");
-    local antiArrest_Checker = nil;
-    local antiArrest_charcheck = nil;
-
-    AntiArrest:NewToggle("AntiArrest", "Prevent you from getting arrested", function(state)
-        if (state) then
-            repeat task.wait() until plr and plr.Character and plr.Character:FindFirstChild("Head")
-            local oldCFrame = nil;
-
-            antiArrest_Checker = plr.Character:FindFirstChild("Head").ChildAdded:Connect(function()
-                if (char:FindFirstChild("Head") and charadded:FindFirstChild("Head"):FindFirstChild("handcuffedGui")) then
-                    if (not Humanoid or not HumanoidRootPart) then return end;
-                    char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
-                    char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
-                    oldCFrame = HumanoidRootPart.CFrame;
-                    loadchar();
-                end
-            end)
-
-            antiArrest_charcheck = plr.CharacterAdded:Connect(function(charadded)
-                repeat task.wait() until charadded:FindFirstChildWhichIsA("Humanoid") and charadded:FindFirstChild("HumanoidRootPart") and charadded:FindFirstChild("Head")
-                if (oldCFrame == nil) then return end;
-                plr.Character:FindFirstChild("HumanoidRootPart").CFrame = oldCFrame;
-                oldCFrame = nil;
-                char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, true);
-
-                antiArrest_Checker = plr.Character:FindFirstChild("Head").ChildAdded:Connect(function()
-                    if (charadded:FindFirstChild("Head") and charadded:FindFirstChild("Head"):FindFirstChild("handcuffedGui")) then
-                        if (not Humanoid or not HumanoidRootPart) then return end;
-                        char:FindFirstChildWhichIsA("Humanoid").BreakJointsOnDeath = false;
-                        char:FindFirstChildWhichIsA("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Dead, false);
-                        oldCFrame = HumanoidRootPart.CFrame;
-                        loadchar();
-                    end
-                end)
-            end)
-        else
-            if (antiArrest_Checker) then
-                antiArrest_Checker:Disconnect();
-                antiArrest_Checker = nil;
-            end
-
-            if (antiArrest_charcheck) then
-                antiArrest_charcheck:Disconnect();
-                antiArrest_charcheck = nil;
-            end
-        end
-    end)
-
-    local HackerDetector = ExploitTab:NewSection("HackerDetector")
-    local HackerDetectorEnabled = false
-
-    HackerDetector:NewToggle("Toggle", "Check if someone exploiting or hacking!", function(state)
-        if state == true then
-            HackerDetectorEnabled = true
-        else
-            HackerDetectorEnabled = false
-        end
-    end)
-
-    --------------
-    game:GetService("RunService").Heartbeat:Connect(function()
-        char = plr.Character or plr.CharacterAdded
-        if LoopTeleportAllowed == true then
-            task.spawn(function()
-                if PlayerControll ~= nil then
-                    if PlayerControll.Character then
-                        if Humanoid and Humanoid.Sit == true then
-                            Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-                         end
-                        char:FindFirstChild("HumanoidRootPart").CFrame = PlayerControll.Character:FindFirstChild("HumanoidRootPart").CFrame
-                    end
-                end
-            end)
-        end
-        
-        if LoopTeleportBring == true then
-            task.spawn(function()
-                if PlayerControll ~= nil then
-                    if PlayerControll.Character then
-                        local targetroot = PlayerControll.Character:FindFirstChild("HumanoidRootPart").CFrame
-                        for i = 1, 5 do
-                            char:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(targetroot.X + 1, targetroot.Y + -1, targetroot.Z - 0.5)
-                            char:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(targetroot.X - 1, targetroot.Y - -1, targetroot.Z + 0.5)
-                        end
-                    end
-                end
-            end)
-        end
-
-        if KillAuraToggle == true then
-            task.spawn(function()
-                for i, v in pairs(game:GetService("Players"):GetPlayers()) do
-                    if v ~= plr then
-                        if v.Character then
-                            if v.Character:FindFirstChild("HumanoidRootPart") then
-                                if (v.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 20 then
-                                    task.wait(.5)
-                                    local args = {
-                                        [1] = v
-                                    }
-                
-                                    game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
-                                end
-                            end
-                        end
-                    end
-                 end
-            end)
-        end
-
-        if InfAmmoEnabled == true then
-            if Gunmodule ~= nil then
-                Gunmodule["MaxAmmo"] = 10000
-                Gunmodule["CurrentAmmo"] = 10000
-            end
-        end
-
-        if LessFireRateEnabled == true then
-            if Gunmodule ~= nil then
-                Gunmodule["FireRate"] = 0.1
-            end
-        end
-
-        if ConsoleSpammerEnabled == true then
-            if game:GetService("ReplicatedStorage"):FindFirstChild("ServerConsoleError") then
-                local args = {
-                    [1] = game:GetService("ReplicatedStorage"):FindFirstChild("ServerConsoleError")
-                }
-                
-                workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-            end
-        end
-
-        if KillPunch == true then
-            if PlayerControll ~= nil then
-                if PlayerControll.Character:FindFirstChild("HumanoidRootPart") then
-                    if (PlayerControll.Character:FindFirstChild("HumanoidRootPart").Position.Magnitude - HumanoidRootPart.Position.Magnitude) < 50 then
-                        local args = {
-                            [1] = PlayerControll
-                        }
-            
-                        game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
-                    else
-                        LoopTeleportAllowed = true
-                        task.wait(.1)
-                        local args = {
-                            [1] = PlayerControll
-                        }
-            
-                        game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
-                        task.wait(.1)
-                        LoopTeleportAllowed = false
-                    end
-                end
-            end
-        end
-
-        if LoopKillToggle == true then
-            task.spawn(function()
-                if PlayerControll ~= nil and PlayerControll.Character then
-                    local plrlastteam = nil
-            
-                    local args = {
-                        [1] = {
-                            [1] = {
-                                ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-391.1522521972656, 8.655600547790527, -83.21669006347656)),
-                                ["Distance"] = 3.2524313926697,
-                                ["Cframe"] = CFrame.new(Vector3.new(840.310791015625, 101.33413696289062, 2267.8798828125), Vector3.new(0.9864164590835571, -0.15174193680286407, -0.06290365755558014)),
-                                ["Hit"] = PlayerControll.Character.Head
-                            },
-                            [2] = {
-                                ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-392.4814758300781, -8.449393272399902, -76.72613525390625)),
-                                ["Distance"] = 3.2699294090271,
-                                ["Cframe"] = CFrame.new(Vector3.new(840.2904663085938, 101.18418884277344, 2267.93505859375), Vector3.new(0.9935879707336426, -0.05921658128499985, -0.096314437687397)),
-                                ["Hit"] = PlayerControll.Character.Head
-                            },
-                            [3] = {
-                                ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-389.2170104980469, -2.5053632259368896, -92.21631622314453)),
-                                ["Distance"] = 3.1665518283844,
-                                ["Cframe"] = CFrame.new(Vector3.new(840.3388671875, 101.23649597167969, 2267.8037109375), Vector3.new(0.9954167008399963, -0.09418468177318573, -0.016576465219259262)),
-                                ["Hit"] = PlayerControll.Character.Head
-                            },
-                            [4] = {
-                                ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-393.3539733886719, 3.139889717102051, -72.54520416259766)),
-                                ["Distance"] = 3.3218522071838,
-                                ["Cframe"] = CFrame.new(Vector3.new(840.2772216796875, 101.28595733642578, 2267.970703125), Vector3.new(0.9859949350357056, -0.11956311762332916, -0.11626961082220078)),
-                                ["Hit"] = PlayerControll.Character.Head
-                            },
-                            [5] = {
-                                ["RayObject"] = Ray.new(Vector3.new(845.555908203125, 101.42933654785156, 2269.439453125), Vector3.new(-390.7317199707031, 3.2097764015197754, -85.5477523803711)),
-                                ["Distance"] = 3.222757101059,
-                                ["Cframe"] = CFrame.new(Vector3.new(840.3179931640625, 101.28642272949219, 2267.8603515625), Vector3.new(0.9910106658935547, -0.12353070080280304, -0.05136203020811081)),
-                                ["Hit"] = PlayerControll.Character.Head
-                            }
-                        },
-                        [2] = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild("Remington 870")
-                    }
-                    
-                    game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
-                    game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
-                end
-            end)
-        end
-
-        if SpeedEnabled == true then
-            if Humanoid.MoveDirection.Magnitude > 0 then
-                if SpeedNumber and char and Humanoid and Humanoid.Parent then
-                    char:TranslateBy(Humanoid.MoveDirection * tonumber(SpeedNumber/500))
-                    Humanoid.JumpPower = tonumber(SpeedJumpPower)
-                else
-                    char:TranslateBy(Humanoid.MoveDirection)
-                end
-            end
-        end
-
-        if HackerDetectorEnabled == true then
-            local AlreadyTeamDetect = {}
-            for i, v in pairs(game:GetService("Players"):GetPlayers()) do
-                if v ~= game:GetService("Players").LocalPlayer then
-                    if v.Team == nil then
-                        task.spawn(function()
-                            for i, TeamDetectRun in pairs(AlreadyTeamDetect) do
-                                if not TeamDetectRun:FindFirstChild(v.Name) and HackerDetectorEnabled == true then
-                                    game:GetService("StarterGui"):SetCore("ChatMakeSystemMessage",{
-                                        Text = tostring(v.Name).." Black Dark Team Detected!",
-                                        Font = Enum.Font.SourceSansBold,
-                                        TextSize = 20,
-                                        Color = Color3.new(255, 255, 255)
-                                    })
-                                    table.insert(AlreadyTeamDetect, v.Name)
-                                end
-                            end
-                        end)
-                    end
-
-                    if char:FindFirstChild("HumanoidRootPart") then
-                        task.spawn(function()
-                            local anotherguychar = v.Character or v.CharacterAdded
-                                local AnotherHumanoidRootPart = anotherguychar:FindFirstChild("HumanoidRootPart")
-                                local OldPos = AnotherHumanoidRootPart.Position
-                                task.wait(1)
-                                local NewPos = AnotherHumanoidRootPart.Position
-                                if anotherguychar:FindFirstChildWhichIsA("Humanoid") and Humanoid.MoveDirection.X ~= 0 and Humanoid.MoveDirection.Z ~= 0 and HackerDetectorEnabled == true then
-                                    if (NewPos - OldPos).Magnitude > 80 and anotherguychar:FindFirstChildWhichIsA("Humanoid").Sit == false then
-                                        game:GetService("StarterGui"):SetCore("ChatMakeSystemMessage",{
-                                            Text = tostring(v.Name).." Speed Cheating, Type: Can't Detect!",
-                                            Font = Enum.Font.SourceSansBold,
-                                            TextSize = 20,
-                                            Color = Color3.new(255, 255, 255)
-                                        })
-                                    end
-                                end
-                                if anotherguychar:FindFirstChildWhichIsA("Humanoid") and Humanoid.MoveDirection.X ~= 0 and Humanoid.MoveDirection.Z ~= 0 and HackerDetectorEnabled == true then
-                                    if anotherguychar:FindFirstChildWhichIsA("Humanoid").PlatformStand == true then
-                                        game:GetService("StarterGui"):SetCore("ChatMakeSystemMessage",{
-                                            Text = tostring(v.Name).." Fly Cheating, Type: Normal!",
-                                            Font = Enum.Font.SourceSansBold,
-                                            TextSize = 20,
-                                            Color = Color3.new(255, 255, 255)
-                                        })
-                                    end
-                                end
-
-                                if not anotherguychar:FindFirstChildWhichIsA("Humanoid") then
-                                    game:GetService("StarterGui"):SetCore("ChatMakeSystemMessage",{
-                                        Text = tostring(v.Name).." No Humanoid Detector, Type: RE!",
-                                        Font = Enum.Font.SourceSansBold,
-                                        TextSize = 20,
-                                        Color = Color3.new(255, 255, 255)
-                                    })
-                                end
-                            end)
-                        end
-                    end
-            end
-        end
-
-        if CrashServerMode == true then
-            if CrashServerType == "GunCrash" then
-                for crashdude = 1, MaxCrashPacket do
-                    local args = {
-                        [1] = PacketCrashTable,
-                        [2] = GunCrashModule
-                    }
-                    
-                    game:GetService("ReplicatedStorage").ShootEvent:FireServer(unpack(args))
-                end
-            elseif CrashServerType == "CarSpamCrash" then
-                for carspam = 1, MaxCrashPacket do
-                    local args = {
-                        [1] = workspace.Prison_ITEMS.buttons:FindFirstChild("Car Spawner"):FindFirstChild("Car Spawner")
-                    }
-
-                    workspace.Remote.ItemHandler:InvokeServer(unpack(args))
-                end
-            elseif CrashServerType == "RespawnCrash" then
-                for RespawnCrashgobr = 1, MaxCrashPacket do
-                    if char and Humanoid and HumanoidRootPart then
-                        local oldpos = HumanoidRootPart.CFrame
-                        Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
-                        task.wait(.1)
-                        local args = {
-                            [1] = plr.Name
-                        }
-                        
-                        loadchar()
-                        task.wait(.1)
-                        HumanoidRootPart.CFrame = oldpos
-                    end
-                end
-            elseif CrashServerType == "PunchCrash" then
-                for punchforkill = 1, MaxCrashPacket do
-                    for i, playerinpair in pairs(game:GetService("Players"):GetPlayers()) do
-                        local plrrandom = playerinpair.Name[math.random(1, #playerinpair.Name)]
-                        if plrrandom.Character and plrrandom.Character:FindFirstChild("HumanoidRootPart") then
-                            HumanoidRootPart.CFrame = plrrandom.Character:FindFirstChild("HumanoidRootPart").CFrame
-                            local args = {
-                                [1] = plrrandom
-                            }
-            
-                            game:GetService("ReplicatedStorage").meleeEvent:FireServer(unpack(args))
-                        end
-                    end
-                end
-            end
-         end
-
-        if AlwaysJumpCheck == true then
-            if Humanoid.FloorMaterial ~= Enum.Material.Air and Humanoid.MoveDirection.X ~= 0 and Humanoid.MoveDirection.Z ~= 0 and SpeedEnabled == true then
-                Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-            end
-        end
-
-        if RemoteAllDoorLoop == true then
-            for i, v in pairs(game:GetService("Workspace"):FindFirstChild("Doors"):GetChildren()) do
-                if v:FindFirstChild("block") then
-                    for looprun = 1, 10 do
-                        firetouchinterest(char:FindFirstChild("Head"), v:FindFirstChild("block"):FindFirstChild("hitbox"), 0)
-                        firetouchinterest(char:FindFirstChild("Head"), v:FindFirstChild("block"):FindFirstChild("hitbox"), 1)
-                    end
-                end
-            end
-        end
-
-        Humanoid = char:FindFirstChildWhichIsA("Humanoid")
-    end)
-
-    game:GetService("Players").PlayerAdded:Connect(function()
-        GetPlayerTable()
-        PlayerControllerDropDown:Refresh(PlayerInGame)
-    end)
-
-    game:GetService("Players").PlayerRemoving:Connect(function()
-        GetPlayerTable()
-        PlayerControllerDropDown:Refresh(PlayerInGame)
-    end)
-else
-    print("You join the wrong game, the script only work for Prison Life".." The game here: https://www.roblox.com/games/155615604/Prison-Life-Cars-fixed. Also i copied the link to your clipboard")
-    setclipboard("https://www.roblox.com/games/155615604/Prison-Life-Cars-fixed")
-end
+return Synnax
